@@ -12,7 +12,7 @@ from scipy.special import psi
 
 
 
-def variational_inference(word_incidences, dirich_param, word_prob_given_topic):
+def variational_inference(document, dirich_param, word_prob_given_topic):
     """
     obtain a tight lower bound on the log-likelihood of an LDA model for a 
     document, as described in 
@@ -34,16 +34,20 @@ def variational_inference(word_incidences, dirich_param, word_prob_given_topic):
     the variational parameter for the multinomial distribution
     """
 
-    [nb_topics, voc_size] = np.shape(word_prob_given_topic)
+    incident_words, word_incidences = np.transpose(document)
+
+    subvoc_size = np.shape(incident_words)[0]
+
+    nb_topics = np.shape(word_prob_given_topic)[0]
 
     var_dirich = dirich_param + np.sum(word_incidences) / nb_topics
-    var_multinom = np.ones([voc_size, nb_topics]) / nb_topics
+    var_multinom = np.ones([subvoc_size, nb_topics]) / nb_topics
 
     stop = var_inf_stop()
 
     while(not stop(var_dirich)):
 
-        var_multinom = np.transpose(word_prob_given_topic) \
+        var_multinom = np.transpose(word_prob_given_topic[:,incident_words]) \
                        * np.exp(psi(var_dirich))
             
         var_multinom = (var_multinom 
