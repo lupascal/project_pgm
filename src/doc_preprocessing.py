@@ -1,11 +1,10 @@
-
+import numpy as np
 import re
 import mmap
 import os
 
 
 
-word_ = re.compile(r'\b\w+')
 
 word_or_doc_end_ = re.compile(r'(\b\w+)|(</BODY>)')
 
@@ -14,6 +13,7 @@ def build_voc(file_names):
     voc = {}
     voc_size = 0
     docs_found = 0
+    documents = []
 
     for file_name in file_names:
 
@@ -30,19 +30,21 @@ def build_voc(file_names):
                 if(open_tag):
                     docs_found += 1
                     file_handle.seek(pos + open_tag.end())
-                    (voc_size, pos) = add_to_voc(
+                    (voc_size, pos, doc_rep) = add_to_voc(
                         file_handle, voc, voc_size)
+                    documents += [doc_rep]
                 else:
                     file_over = True
 
-        print 'vocabulariy size: %d' % voc_size
-        print '%d docs found' % docs_found
-    return voc
+    return voc, documents
 
 
     
 
 def add_to_voc(file_handle, voc, voc_size):
+
+    document_voc = {}
+
     while(True):
         line = file_handle.readline()
         words = re.findall(word_or_doc_end_, line)
@@ -52,10 +54,16 @@ def add_to_voc(file_handle, voc, voc_size):
                 if(not voc.has_key(word)):
                     voc[word] = voc_size
                     voc_size += 1
+                if(document_voc.has_key(word)):
+                    document_voc[word] += 1
+                else:
+                    document_voc[word] = 1
             elif(end_tag):
-                return(voc_size, file_handle.tell())
+                document_rep = np.array([(voc[word], document_voc[word]) 
+                                         for word in document_voc])
+                return(voc_size, file_handle.tell(), document_rep)
 
-    return(voc_size, file_handle.tell())
+    return(voc_size, file_handle.tell(), document_rep)
 
 
 

@@ -1,0 +1,108 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc} 
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{
+    bookmarks=true,         
+    unicode=true,  
+    colorlinks=true,       
+    linkcolor=blue,          
+    citecolor=blue,       
+    filecolor=blue,      
+    urlcolor=blue          
+}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\usepackage{geometry}
+\geometry{hmargin=2.5cm,vmargin=2.5cm}
+\setlength{\parindent}{0pt}
+\everymath{\displaystyle}
+\renewcommand{\baselinestretch}{1.1}
+\usepackage[ruled,vlined]{algorithm2e}
+
+\begin{document}
+
+\subsection*{Notations}
+\begin{itemize}
+  \item \verb"num_topics" $=k$ (number of topics)
+  \item $D$ = corpus (collection of $|D|$ documents)
+  \item \verb"num_docs" $=|D|$ (number of documents)
+  \item \verb"voc_size" $=|V|$ (vocabulary size)
+  \item \verb"dirich_param": an estimate of the parameter of the dirichlet distribution
+        which generates the parameter for the (multinomial) probability
+        distribution over topics in the document.
+        
+        size$(\alpha) = $ number of topics
+        
+  \item \verb"word_prob_given_topic": an array of size (nb topics, vocabulary size) which
+        gives the (estimated) probability that a given topic will generate a
+        certain word.
+        
+        \[ \beta_{ij}= p(w^j = 1 | z^i = 1) \]
+        
+        size($\beta$) = number of topics $\times$ vocabulary size
+ \end{itemize}
+
+\bigskip
+
+\emph{The following variables depend on the document $d$.}
+ \begin{itemize}
+  \item \verb"doc_size" $=|N_d|$ (number of words in the document $d$)
+  \item \verb"var_dirich": the variational parameter for the dirichlet distribution,
+ 
+  For a document $d$, size($\gamma^{(d)}$) = number of topics
+  \item \verb"var_multinom": the variational parameter for the multinomial distribution
+  
+  For a document $d$, size($\phi^{(d)}$) = number of words in document $d$ $\times$ number of topics
+  
+  $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
+   
+  \item \verb"word_incidences": an array containing the number of times each word in the
+    vocabulary appears in the document.
+    
+    For a document $d$,  size($w^{(d)}$) = number of words in document $d$ $\times$ vocabulary size 
+    
+    $w_{nj}^{(d)} = \begin{cases} 1 & \text{if the word in position } n \text{ of the document is the word in position } j \text{ of the dictionary} \\ 0 & \text{otherwise} \end{cases}$
+\end{itemize}
+
+\newpage
+
+\subsection*{Algorithms}
+
+\begin{algorithm}
+\caption{E-step for a document $d$}
+\KwData{\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
+\KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
+%\Begin{}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{M-step}
+\KwData{$\{$\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$), $d \in D\}$}
+\KwResult{\texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
+\Begin{
+$\beta_{ij} \propto \sum_{d \in D} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$
+
+Until convergence:
+
+\quad\quad $\alpha \leftarrow \alpha - H(\alpha)^{-1}g(\alpha)$ where $g (\alpha)= \left( \frac{\partial L}{\partial \alpha_i}\right)_i$ and $H(\alpha) = \left( \frac{\partial L}{\partial\alpha_i\partial\alpha_j}\right)_{ij}$
+
+\[ \begin{cases} \frac{\partial L}{\partial \alpha_i} = |D| \left[ \Psi\left( \sum_{j=1}^k \alpha_j\right) - \Psi(\alpha_i)\right] + \sum_{d \in D} \left[\Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
+ \frac{\partial L}{\partial \alpha_i\partial \alpha_j} = \delta_{ij} |D| \Psi'(\alpha_i) - \Psi' \left( \sum_{j=1}^k \alpha_j\right) \end{cases} \]
+}
+\end{algorithm}
+
+
+We note that $H(\alpha) = \text{diag}(h) - 1z1^{\top}$ where:
+\[ h = ( |D| \Psi'(\alpha_i))_i \quad \text{and} \quad z = \left(\Psi' \left( \sum_{p=1}^k \alpha_p\right)\right)_{i, j} \]
+
+Then $(H^{-1}(\alpha)g(\alpha))_i = \frac{\frac{\partial L}{\partial \alpha_i} -c}{ \frac{\partial^2 L}{\partial \alpha_i^2}}$ where $c = \frac{\sum_{j=1}^k \frac{\frac{\partial L}{\partial \alpha_j}}{ \frac{\partial^2 L}{\partial \alpha_j^2}}}{z^{-1}+\sum_{j=1}^k \left( \frac{\partial^2 L}{\partial \alpha_i^2}\right)^{-1}}$.
+
+
+
+\end{document}
