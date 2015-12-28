@@ -20,11 +20,6 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
             = maximise_log_likelihood(corpus, dirich_param, 
                                       word_proba_given_topic)
         
-        print dirich_param
-        print compute_log_likelihood(corpus[0], dirich_param,
-                                     word_proba_given_topic,
-                                     var_dirich, var_multinom)
-
     return dirich_param, word_proba_given_topic, var_dirich
     
 
@@ -137,7 +132,8 @@ def compute_hessian_gradient(dirich_param, list_var_dirich, num_docs):
 
 
 
-def variational_inference(document, log_dirich_param, word_logprob_given_topic):
+def variational_inference(document, log_dirich_param, word_logprob_given_topic,
+                          save_log_likelihoods = False):
 
     incident_words, word_incidences = np.transpose(document)
 
@@ -155,6 +151,8 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic):
     log_likelihood = None
     
     stop = var_inf_stop(threshold = 1e-3, max_iter = 30)
+
+    log_likelihoods = []
 
     while(not stop(log_likelihood)):
         
@@ -174,13 +172,18 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic):
             np.exp(log_var_dirich),
             np.exp(log_var_multinom),
             word_incidences)
-        
+
+        if(save_log_likelihoods):
+            log_likelihoods.append(log_likelihood)
+            
         print 'log likelihood: %g' % log_likelihood
 
     print '\n'
+
+    if(save_log_likelihoods):
+        return np.exp(log_var_dirich), np.exp(var_multinom), log_likelihoods
     
     return np.exp(log_var_dirich), np.exp(var_multinom)
-                                                    
 
 
 
@@ -222,6 +225,8 @@ class var_inf_stop(object):
         self.previous_log_likelihood_ = new_log_likelihood
 
         return diff < self.threshold_
+
+
 
 
 def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
