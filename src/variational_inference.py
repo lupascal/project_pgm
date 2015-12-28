@@ -18,20 +18,19 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
     while(not converged(dirich_param)):
         (dirich_param, word_proba_given_topic, var_dirich) \
             = maximise_log_likelihood(corpus, dirich_param, 
-                                      word_proba_given_topic)
+                                      word_proba_given_topic, dirich_param)
         
         print dirich_param
-        print compute_log_likelihood(corpus[0], dirich_param,
-                                     word_proba_given_topic,
-                                     var_dirich, var_multinom)
+        #print compute_log_likelihood(corpus[0], dirich_param,
+        #                             word_proba_given_topic,
+        #                             var_dirich, var_multinom)
 
     return dirich_param, word_proba_given_topic, var_dirich
     
 
 
 def initialize_params(corpus, nb_topics, voc_size):
-    dirich_param = np.random.rand(nb_topics)
-    dirich_param /= np.sum(dirich_param)
+    dirich_param = np.random.rand()
     word_proba_given_topic = np.random.rand(nb_topics, voc_size)
     word_proba_given_topic /= np.sum(word_proba_given_topic, 
                                      axis = 1)[:, np.newaxis]
@@ -39,7 +38,7 @@ def initialize_params(corpus, nb_topics, voc_size):
 
 
 def maximise_log_likelihood(corpus, old_dirich, old_word_proba,
-                            convergence_threshold = .1):
+                            convergence_threshold = .1, old_dirich_param):
     """
     corresponds to the M-step of Parameter estimation (paragraph 5.3)
     arguments:
@@ -81,18 +80,20 @@ def maximise_log_likelihood(corpus, old_dirich, old_word_proba,
     word_proba_given_topic /= normalizing_constant[:,np.newaxis]
 
     # compute dirich_param (alpha)
-    dirich_param = np.ones(num_topics) / num_topics
+    dirich_param = old_dirich_param
     
     error = -1
     nb_iter = 0
     while(nb_iter < 10 and (convergence_threshold < error or error < 0)):
         nb_iter += 1
-        # compute H^{-1}(dirich_param) g(dirich_param)
-        hessian_gradient = compute_hessian_gradient(dirich_param, 
-                                                    var_dirich, num_docs)
+        # compute gradient and hessian of the log-likelihood wrt dirich_param
+        gradient = compute_gradient_wrt_dirich_param(dirich_param, var_dirich, num_docs, num_topics)
+        hessian = compute_hessian_wrt_dirich_param(dirich_param, num_docs, num_topics)
         # dirich_param <- dirich_param - H^{-1}(dirich_param) g(dirich_param)
-        dirich_param = dirich_param - hessian_gradient
-        error = np.linalg.norm(hessian_gradient)
+        coefficient = gradient/hessian
+        dirich_param = dirich_param - coefficient
+        
+        error = np.abs(coefficient)
         print error
 
 
@@ -100,40 +101,19 @@ def maximise_log_likelihood(corpus, old_dirich, old_word_proba,
 
 
 
-
-# Compute the gradient for Newton-Raphson (in order to compute dirich_param)
-def compute_gradient_dirichlet(dirich_param, var_dirich, num_docs):
-    grad_L = num_docs*(psi(np.sum(dirich_param)) - psi(dirich_param))
-    grad_L += np.sum(psi(var_dirich) 
+# Compute the gradient of the expected log-likelihood wrt dirich_param
+def compute_gradient_wrt_dirich_param(dirich_param, var_dirich, num_docs, num_topics):
+    gradient = num_docs*num_topics*(psi(num_topics*dirich_param) - psi(dirich_param))
+    gradient += np.sum(psi(var_dirich) 
                      - psi(np.sum(var_dirich, axis = 0)), axis = 0)
+    return gradient
 
-    return grad_L
-
-
-# Compute diagonal terms of the hessian matrix
-def compute_hessian_dirichlet_diag(dirich_param, num_docs):
-    return (num_docs*polygamma(1, dirich_param))
-
-
-# Compute the vector z of the hessian matrix
-def compute_hessian_dirichlet_z(dirich_param):
-    return (polygamma(1, np.sum(dirich_param)))
-
-
-# Compute H^(-1) * g where H = hessian and g = gradient for Newton-Raphson 
-#(in order to compute dirich_param)
-# input = dirich_param (alpha), list_var_dirich (list of gamma), num_docs
-def compute_hessian_gradient(dirich_param, list_var_dirich, num_docs):
-
-    grad_L = compute_gradient_dirichlet(dirich_param, list_var_dirich, num_docs)
-    h = compute_hessian_dirichlet_diag(dirich_param, num_docs)
-    z = compute_hessian_dirichlet_z(dirich_param)
-    c = np.sum(grad_L/h)/(1/z+np.sum(1/h))
-
-    hessian_gradient = (h - c)/grad_L
-
-    return hessian_gradient
-
+# Compute the hessian of the expected log-likelihood wrt dirich_param
+def compute_hessian_wrt_dirich_param(dirich_param, num_docs, num_topics):
+    hessian = (num_docs*num_topics
+              * (num_topics*polygamma(1, num_topics*dirich_param)
+              - polygamma(1, num_topics*dirich_param) ) )
+    return hessian
 
 
 
@@ -163,7 +143,6 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic):
 
         log_var_multinom -= logsumexp(var_multinom, axis = 1)[:, np.newaxis]
         
-    
         log_var_dirich = log_dirich_param + logsumexp(
             np.log(word_incidences) + np.transpose(np.exp(log_var_multinom)),
             axis = 1)
@@ -180,20 +159,36 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic):
     print '\n'
     
     return np.exp(log_var_dirich), np.exp(var_multinom)
-                                                    
-
-
 
 
 # var_multinom = np.transpose(word_prob_given_topic[:,incident_words]) \
         #                * np.exp(psi(var_dirich))
-
         # var_multinom = (var_multinom 
-        #                 / np.sum(var_multinom, axis = 1)[:, np.newaxis])
-        
+        #                 / np.sum(var_multinom, axis = 1)[:, np.newaxis])        
         # var_dirich = dirich_param + np.sum(
         #     word_incidences * np.transpose(np.exp(var_multinom)), axis = 1)
 
+def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
+                           var_dirich, var_multinom, word_incidences):
+    log_likelihood = (
+        np.log(gamma(np.sum(dirich_param)))
+        - np.sum(np.log(gamma(dirich_param)))
+        + np.sum((dirich_param - 1) * (psi(var_dirich)
+                                       - psi(np.sum(var_dirich))))
+        + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
+        
+        + np.sum(np.log(word_proba_given_topic)
+                 * np.transpose(var_multinom)
+                 * word_incidences)
+
+        - np.log(gamma(np.sum(var_dirich))) + np.sum(np.log(var_dirich))
+        - np.sum((var_dirich - 1) * psi(var_dirich)
+                 - psi(np.sum(var_dirich)))
+        -np.sum(var_multinom * np.log(var_multinom))
+    )
+
+    return log_likelihood
+                     
 
 
 class var_inf_stop(object):
@@ -222,27 +217,3 @@ class var_inf_stop(object):
         self.previous_log_likelihood_ = new_log_likelihood
 
         return diff < self.threshold_
-
-
-def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
-                           var_dirich, var_multinom, word_incidences):
-    log_likelihood = (
-        np.log(gamma(np.sum(dirich_param)))
-        - np.sum(np.log(gamma(dirich_param)))
-        + np.sum((dirich_param - 1) * (psi(var_dirich)
-                                       - psi(np.sum(var_dirich))))
-        + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
-        
-        + np.sum(np.log(word_proba_given_topic)
-                 * np.transpose(var_multinom)
-                 * word_incidences)
-
-        - np.log(gamma(np.sum(var_dirich))) + np.sum(np.log(var_dirich))
-        - np.sum((var_dirich - 1) * psi(var_dirich)
-                 - psi(np.sum(var_dirich)))
-        -np.sum(var_multinom * np.log(var_multinom))
-    )
-
-    return log_likelihood
-                     
-
