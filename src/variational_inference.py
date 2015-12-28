@@ -22,7 +22,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
             = maximization_step(corpus, dirich_param, 
                                       word_proba_given_topic, dirich_param, nb_topics)
 
-        print 'log likelihood: %g' % corpus_log_likelihood
+        #print 'log likelihood: %g' %corpus_log_likelihood
     
     return dirich_param, word_proba_given_topic, var_dirich
 
@@ -81,7 +81,8 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 
         if (save_log_likelihoods):
             log_likelihoods.append(log_likelihood)
-        print 'log likelihood: %g' % log_likelihood
+        #print type(log_likelihood)
+        #print 'log likelihood: %g' %log_likelihood
 
     print '\n'
     if (save_log_likelihoods):
@@ -95,7 +96,7 @@ def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
                            var_dirich, var_multinom, word_incidences, nb_topics):
     
     log_likelihood = (np.log(gamma(nb_topics*dirich_param))
-                      - nb_topics*np.log(gamma(dirich_param)
+                      - nb_topics*np.log(gamma(dirich_param))
                       + (dirich_param-1)*np.sum((psi(var_dirich)
                                                      - psi(np.sum(var_dirich))))
                       + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
