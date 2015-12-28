@@ -15,7 +15,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
         = initialize_params(corpus, nb_topics, voc_size)
     converged = var_inf_stop(max_iter = 10)
 
-    while(not converged(dirich_param)):
+    while(not converged(log_likelihood)):
         # E-step
         var_dirch = []
         var_multinom = []
@@ -31,16 +31,19 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
         (dirich_param, word_proba_given_topic, var_dirich) \
             = maximization_step(corpus, dirich_param, 
                                       word_proba_given_topic, dirich_param)
-        
-        print dirich_param
-        #print compute_log_likelihood(corpus[0], dirich_param,
-        #                             word_proba_given_topic,
-        #                             var_dirich, var_multinom)
-        
-    return dirich_param, word_proba_given_topic, var_dirich
+
+        # compute the corpus log-likelihood
+        log_likelihood = compute_corpus_log_likelihood(corpus, dirich_param,
+                                     word_proba_given_topic,
+                                     var_dirich, var_multinom)
+
+        print 'log likelihood: %g' % log_likelihood
     
+    return dirich_param, word_proba_given_topic, var_dirich
 
 
+
+# initialization
 def initialize_params(corpus, nb_topics, voc_size):
     dirich_param = np.random.rand()
     word_proba_given_topic = np.random.rand(nb_topics, voc_size)
@@ -60,12 +63,12 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 
     nb_topics = np.size(word_logprob_given_topic, axis = 0)
 
-    var_dirich = np.exp(log_dirich_param) + np.sum(word_incidences) / nb_topics
-    log_var_dirich_document = np.log(var_dirich)
+    var_dirich_document = np.exp(log_dirich_param) + np.sum(word_incidences) / nb_topics
+    log_var_dirich_document = np.log(var_dirich_document)
         
-    var_multinom = np.ones([subvoc_size, nb_topics]) / nb_topics
+    var_multinom_document = np.ones([subvoc_size, nb_topics]) / nb_topics
     
-    log_var_multinom = np.zeros((subvoc_size, nb_topics)) - np.log(nb_topics)
+    log_var_multinom_document = np.zeros((subvoc_size, nb_topics)) - np.log(nb_topics)
 
     log_likelihood = None
     
@@ -75,10 +78,10 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 
     while(not stop(log_likelihood)):
         
-        log_var_multinom = np.transpose(
-            word_logprob_given_topic[:, incident_words]) + psi(var_dirich)
+        log_var_multinom_document = np.transpose(
+            word_logprob_given_topic[:, incident_words]) + psi(var_dirich_document)
 
-        log_var_multinom -= logsumexp(var_multinom, axis = 1)[:, np.newaxis]
+        log_var_multinom_document -= logsumexp(var_multinom_document, axis = 1)[:, np.newaxis]
         
         log_var_dirich_document = log_dirich_param + logsumexp(
             np.log(word_incidences) + np.transpose(np.exp(log_var_multinom_document)),
@@ -108,23 +111,13 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 def maximization_step(corpus, old_dirich, old_word_proba,
                             convergence_threshold = .1, old_dirich_param):
     """
-    corresponds to the M-step of Parameter estimation (paragraph 5.3)
     arguments:
     (corpus) list of word_incidences (array containing the number of times 
     each word in the vocabulary appears in the document).
-    (list of gamma) = list_var_dirich, list of variational parameters for 
-    the dirichlet distribution,
-    (phi) = list_var_multinom, list of variational parameters for the 
-    multinomial distribution 
+    (list of gamma) = list_var_dirich
+    (phi) = list_var_multinom
     voc_size = vocabulary size 
-    returns
-    (alpha) dirich_param: an estimate of the parameter of the dirichlet 
-    distribution which generates the parameter for the (multinomial) 
-    probability
-    distribution over topics in the document.
-    (beta) word_prob_given_topic: an array of size (nb topics, vocabulary 
-    size) which gives the (estimated) probability that a given topic will
-    generate a certain word.
+    returns dirich_param (alpha) and word_prob_given_topic (beta)
     """
     num_docs = len(corpus)
     num_topics = np.shape(old_word_proba)[0]
@@ -212,24 +205,11 @@ def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
 
 
 def compute_corpus_log_likelihood(corpus, dirich_param, word_proba_given_topic,
-                           var_dirich, var_multinom, word_incidences):
-    log_likelihood = (
-        np.log(gamma(np.sum(dirich_param)))
-        - np.sum(np.log(gamma(dirich_param)))
-        + np.sum((dirich_param - 1) * (psi(var_dirich)
-                                       - psi(np.sum(var_dirich))))
-        + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
-        
-        + np.sum(np.log(word_proba_given_topic)
-                 * np.transpose(var_multinom)
-                 * word_incidences)
-
-        - np.log(gamma(np.sum(var_dirich))) + np.sum(np.log(var_dirich))
-        - np.sum((var_dirich - 1) * psi(var_dirich)
-                 - psi(np.sum(var_dirich)))
-        -np.sum(var_multinom * np.log(var_multinom))
-    )
-
+                                  var_dirich, var_multinom):
+    log_likelihood = 0
+    for i in range(corpus):
+        log_likelihood += compute_log_likelihood(corpus[i], dirich_param, word_proba_given_topic,
+                                                var_dirich, var_multinom[i], word_incidences[i])
     return log_likelihood
 
 
