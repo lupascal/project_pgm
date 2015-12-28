@@ -189,19 +189,19 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 
 \begin{algorithm}
 \caption{EM algorithm}
-\KwData{Corpus $\mathcal{D}$ of documents, number of topics}
+\KwData{Corpus $\mathcal{D}$ of documents, number of topics $k$}
 \KwResult{\texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
 \Begin{
 \For{\emph{each} $d \in \mathcal{D}$}{
 Compute \texttt{word$\_$incidences} ($w^{(d)}$).
 }
 
-Initialize \texttt{dirich$\_$param} ($\alpha$) with a uniform vector of size ``number of topics"\;
+Initialize \texttt{dirich$\_$param} ($\alpha$) with a uniform vector of size $k$\;
 Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 
 \bigskip
 
-\While{not converged}{
+\While{\emph{the expected log-likelihood has not converged}}{
 \For{\emph{each} $d \in \mathcal{D}$}{
 \texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{E-step} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)
 }
@@ -211,7 +211,7 @@ Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 }
 \end{algorithm}
 
-The expected log-likelihood, for a document $d$, is:
+The expected log-likelihood for a document $d$, is:
 \begin{align*}
 L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
 & = \log \Gamma\left( k\alpha \right) - k \log \Gamma(\alpha) + (\alpha - 1)  \sum_{i=1}^k \left( \Psi(\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)} \right) \right) \\
@@ -228,7 +228,7 @@ L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
 \Begin{
 Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
 Initialize $\gamma_i^{(d)} = \alpha + \frac{N_d}{k}$ for all $i$ \;
-\While{not converged}{
+\While{\emph{the expected log-likelihood for the document $d$ has not converged}}{
 \For{$n=1\ldots N_d$}{
 \For{$i=1\ldots k$}{
 $\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
@@ -247,7 +247,7 @@ $\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} \phi_n^{(d)}$
 \Begin{
 $\beta \propto \sum_{d \in \mathcal{D}} (\phi^{(d)})^{\top}w^{(d)}$ (which corresponds to $\beta_{ij} \propto \sum_{d \in \mathcal{D}} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$)
 
-\While{not converged}{
+\While{\emph{$\alpha$ has not converged}}{
 $\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
 L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
 }
