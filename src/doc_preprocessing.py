@@ -8,8 +8,13 @@ import os
 
 word_or_doc_end_ = re.compile(r'(\b\w+)|(</BODY>)')
 
+stop_words_ = frozenset(['a', 'an', 'and', 'are', 'as', 'at', 'be', 'by',
+                         'for', 'from', 'has', 'he', 'in', 'is', 'it', 'its',
+                         'of', 'on', 'said', 'that', 'the', 'to', 'was',
+                         'were', 'will', 'with', 'reuter'])
 
-def build_voc(file_names):
+
+def build_voc(file_names, **kwargs):
     voc = {}
     voc_size = 0
     docs_found = 0
@@ -31,7 +36,7 @@ def build_voc(file_names):
                     docs_found += 1
                     file_handle.seek(pos + open_tag.end())
                     (voc_size, pos, doc_rep) = add_to_voc(
-                        file_handle, voc, voc_size)
+                        file_handle, voc, voc_size, **kwargs)
                     documents += [doc_rep]
                 else:
                     file_over = True
@@ -41,7 +46,8 @@ def build_voc(file_names):
 
     
 
-def add_to_voc(file_handle, voc, voc_size):
+def add_to_voc(file_handle, voc, voc_size, stop_words = stop_words_,
+               to_lower = False, stop_case_sensitive = False):
 
     document_voc = {}
 
@@ -51,13 +57,23 @@ def add_to_voc(file_handle, voc, voc_size):
         for (word, end_tag) in words:
             if(word):
                 assert(not end_tag)
-                if(not voc.has_key(word)):
-                    voc[word] = voc_size
-                    voc_size += 1
-                if(document_voc.has_key(word)):
-                    document_voc[word] += 1
-                else:
-                    document_voc[word] = 1
+                cmp_word = word
+                
+                if(not stop_case_sensitive):
+                    cmp_word = str.lower(cmp_word)
+                    
+                if(not cmp_word in stop_words):
+                    if(to_lower):
+                        word = str.lower(word)
+
+                    if(not voc.has_key(word)):
+                        voc[word] = voc_size
+                        voc_size += 1
+                        
+                    if(document_voc.has_key(word)):
+                        document_voc[word] += 1
+                    else:
+                        document_voc[word] = 1
             elif(end_tag):
                 document_rep = np.array([(voc[word], document_voc[word]) 
                                          for word in document_voc])
@@ -76,3 +92,28 @@ def find_reuters_files(directory = os.getcwd()):
 
     reuters_files.sort()
     return reuters_files
+
+
+def frequencies(voc, docs):
+    freq = np.zeros(len(voc))
+    for doc in docs:
+        freq[doc[:,0]] += doc[:,1]
+    return freq
+
+def order_by_freq(voc, docs):
+    freq = frequencies(voc, docs)
+    return np.argsort(freq)[::-1]
+
+
+def most_frequent(voc, docs, nb = 20, to_lower = False):
+    order = order_by_freq(voc, docs)
+    frequent_words = []
+    if(to_lower):
+        for i in range(nb):
+            frequent_words += [
+                str.lower(word) for word in voc if voc[word] == order[i]]
+    else:
+        for i in range(nb):
+            frequent_words += [word for word in voc if voc[word] == order[i]]
+            
+    return frequent_words
