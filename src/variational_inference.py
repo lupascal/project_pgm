@@ -20,7 +20,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
         # M-step (we compute the E-step in the M-step)
         (dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood) \
             = maximization_step(corpus, dirich_param, 
-                                      word_proba_given_topic, dirich_param)
+                                      word_proba_given_topic, dirich_param, nb_topics)
 
         print 'log likelihood: %g' % corpus_log_likelihood
     
@@ -40,7 +40,7 @@ def initialize_params(corpus, nb_topics, voc_size):
 
 # corresponds to the E-step
 def variational_inference(document, log_dirich_param, word_logprob_given_topic,
-                          save_log_likelihoods = False):
+                          nb_topics, save_log_likelihoods = False):
 
     incident_words, word_incidences = np.transpose(document)
 
@@ -77,7 +77,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
             np.exp(word_logprob_given_topic[:, incident_words]),
             np.exp(log_var_dirich_document),
             np.exp(log_var_multinom_document),
-            word_incidences)
+            word_incidences, nb_topics)
 
         if (save_log_likelihoods):
             log_likelihoods.append(log_likelihood)
@@ -92,11 +92,11 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 
 # compute the log-likehood for one document
 def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
-                           var_dirich, var_multinom, word_incidences):
+                           var_dirich, var_multinom, word_incidences, nb_topics):
     
-    log_likelihood = (np.log(gamma(np.sum(dirich_param)))
-                      - np.sum(np.log(gamma(dirich_param)))
-                      + np.sum((dirich_param - 1) * (psi(var_dirich)
+    log_likelihood = (np.log(gamma(nb_topics*dirich_param))
+                      - nb_topics*np.log(gamma(dirich_param)
+                      + (dirich_param-1)*np.sum((psi(var_dirich)
                                                      - psi(np.sum(var_dirich))))
                       + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
                       
@@ -116,9 +116,9 @@ def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
 ########################################################################################
 
 # corresponds to the M-step
-# arguments: corpus, old_dirich (alpha), old_word_proba (beta)
+# arguments: corpus, old_dirich (alpha), old_word_proba (beta), nb_topics
 # returns new dirich_param, new word_prob_given_topic
-def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold = .1):
+def maximization_step(corpus, old_dirich, old_word_proba, nb_topics, convergence_threshold = .1):
 
     num_docs = len(corpus)
     num_topics = np.shape(old_word_proba)[0]
@@ -160,7 +160,7 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     # compute the corpus log-likelihood
     corpus_log_likelihood = compute_corpus_log_likelihood(corpus, dirich_param,
                                                    word_proba_given_topic,
-                                                   var_dirich, var_multinom)
+                                                   var_dirich, var_multinom, nb_topics)
 
     return dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood
 
@@ -182,11 +182,11 @@ def compute_hessian_wrt_dirich_param(dirich_param, num_docs, num_topics):
 
 # Compute the log-likelihood for the corpus
 def compute_corpus_log_likelihood(corpus, dirich_param, word_proba_given_topic,
-                                  var_dirich, var_multinom):
+                                  var_dirich, var_multinom, nb_topics):
     log_likelihood = 0
     for i in range(corpus):
         log_likelihood += compute_log_likelihood(corpus[i], dirich_param, word_proba_given_topic,
-                                                 var_dirich, var_multinom[i], word_incidences[i])
+                                                 var_dirich, var_multinom[i], word_incidences[i], nb_topics)
     return log_likelihood
 
 ########################################################################################
