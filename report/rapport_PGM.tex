@@ -46,7 +46,7 @@ We consider the problem of modeling text corpora. The goal is to find short desc
 \textbf{Notations}
 \begin{itemize}
 \setlength\itemsep{-0.2em}
-  \item $\mathcal{D} = \{d_{1},d_{2}, \ldots, d_{M}\}$ is a corpus (collection of $M=|D|$ documents). We denote $|D|$ (\verb"num_docs") the number of documents.
+  \item $\mathcal{D} = \{d_{1},d_{2}, \ldots, d_{M}\}$ is a corpus (collection of $M=|\mathcal{D}|$ documents). We denote $|\mathcal{D}|$ (\verb"num_docs") the number of documents.
   \item $\mathcal{V}$ is the vocabulary. Its size is denoted $V$ (\verb"voc_size").
   \item The number of topics is denoted $k$ (\verb"num_topics").
 \end{itemize}
@@ -54,7 +54,7 @@ We consider the problem of modeling text corpora. The goal is to find short desc
 For a document $d \in \mathcal{D}$,
 \begin{itemize}  
 \setlength\itemsep{-0.2em}
-%  \item $d = (w_1, \ldots, w_{n(d)})$ represents the document $d$ of the corpus $D$, composed of a sequence of $n(d)$ words.
+%  \item $d = (w_1, \ldots, w_{n(d)})$ represents the document $d$ of the corpus $^{(d)}$, composed of a sequence of $n(d)$ words.
   \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all distinct. $N_d$ (\verb"doc_size") is the number of \textbf{distinct}\footnote{For implementation issues, this representation for a document is smaller than the representation proposed by \cite{BNJ03}.} words in the document $d$.
   \item $w^{(d)}$ (\verb"word_incidences") is an matrix containing the number of times each word in the vocabulary appears in the document. The size of $w^{(d)}$ is the number of distinct words in document $d$ $\times$ vocabulary size ($N_d \times V$).
  %   $w_{nj}^{(d)} = \begin{cases} 1 & \text{if the word in position } n \text{ of the document is the word in position } j \text{ of the dictionary} \\ 0 & \text{otherwise} \end{cases}$
@@ -248,8 +248,8 @@ $\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} \phi_n^{(d)}$
 $\beta \propto \sum_{d \in \mathcal{D}} (\phi^{(d)})^{\top}w^{(d)}$ (which corresponds to $\beta_{ij} \propto \sum_{d \in \mathcal{D}} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$)
 
 \While{not converged}{
-$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |D| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
-L''(\alpha) = |D|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
+$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
+L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
 }
 }
 \end{algorithm}
