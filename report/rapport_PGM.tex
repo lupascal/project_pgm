@@ -27,8 +27,8 @@
 
 \title{Latent Dirichlet allocation}
 \author{
-J\'er\^ome DOCK\`ES (\texttt{jerome@dockes.org}) \\
-\textbf{Pascal LU (\texttt{pascal.lu@student.ecp.fr})} \\
+J\'er\^ome DOCK\`ES (\texttt{jerome\{at\}dockes.org}) \\
+\textbf{Pascal LU (\texttt{pascal.lu\{at\}student.ecp.fr})} \\
 \'Ecole Normale Sup\'erieure de Cachan \\
 }
 
@@ -55,7 +55,7 @@ For a document $d \in \mathcal{D}$,
 \begin{itemize}  
 \setlength\itemsep{-0.2em}
 %  \item $d = (w_1, \ldots, w_{n(d)})$ represents the document $d$ of the corpus $D$, composed of a sequence of $n(d)$ words.
-  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all distinct. $N_d$ (\verb"doc_size") is the number of \textbf{distinct}\footnote{For implementation issues} words in the document $d$.
+  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all distinct. $N_d$ (\verb"doc_size") is the number of \textbf{distinct}\footnote{For implementation issues, this representation for a document is smaller than the representation proposed by \cite{BNJ03}.} words in the document $d$.
   \item $w^{(d)}$ (\verb"word_incidences") is an matrix containing the number of times each word in the vocabulary appears in the document. The size of $w^{(d)}$ is the number of distinct words in document $d$ $\times$ vocabulary size ($N_d \times V$).
  %   $w_{nj}^{(d)} = \begin{cases} 1 & \text{if the word in position } n \text{ of the document is the word in position } j \text{ of the dictionary} \\ 0 & \text{otherwise} \end{cases}$
  \item $\theta^{(d)}$ is an array of size $k$, representing a probability density.
@@ -85,11 +85,11 @@ Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability c
 \begin{center}
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-0.5,-0.3)(8,3.5)
-\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha$}}}
+\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
 \rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
 \rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
 \rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
-\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta$}}}
+\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
 \pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
 \pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
 \psline{->}(0.27,1)(1.58,1)
@@ -106,7 +106,7 @@ Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability c
 
 The following parameters are introduced:
 \begin{itemize}
-  \item $\alpha$ (\verb"dirich_param") is an estimate of the parameter of the dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. The size of $\alpha$ is the number of topics, $k$. \textbf{We suppose that $\alpha = \alpha \mathbf{1}_{k}$.}
+  \item $\alpha$ (\verb"dirich_param") is an estimate of the parameter of the dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. The size of $\alpha$ is the number of topics, $k$. \textbf{We suppose that $\alpha = \alpha \mathbf{1}_{k}$\footnote{This assumption is suggested by the authors of \cite{BNJ03}.} .}
   
   \item $\beta$ (\verb"word_prob_given_topic") is a matrix of size (number of topics $\times$ vocabulary size $= k \times V$) which gives the (estimated) probability that a given topic will generate a certain word:
 \[ \beta_{ij}= p(w^j = 1 | z^i = 1) \]
@@ -144,11 +144,11 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 \begin{center}
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-0.5,-0.3)(8,3.5)
-\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha$}}}
+\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
 \rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
 \rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
 \rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
-\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta$}}}
+\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
 \pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
 \pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
 \psline{->}(0.27,1)(1.58,1)
@@ -227,15 +227,15 @@ L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
 \KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
 \Begin{
 Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
-Initialize $\gamma_i^{(d)} = \alpha + \frac{N}{k}$ for all $i$ \;
+Initialize $\gamma_i^{(d)} = \alpha + \frac{N_d}{k}$ for all $i$ \;
 \While{not converged}{
-\For{$n=1\ldots N$}{
+\For{$n=1\ldots N_d$}{
 \For{$i=1\ldots k$}{
-$\phi_{ni}^{(d)} = \beta_iw_n\exp(\Psi(\gamma_i^{(d)}))$
+$\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
 }
 normalize $\phi_n^{(d)}$ to sum to $1$.
 }
-$\gamma^{(d)} = \alpha + \sum_{n=1}^N \phi_n^{(d)}$
+$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} \phi_n^{(d)}$
 }
 }
 \end{algorithm}
@@ -248,8 +248,8 @@ $\gamma^{(d)} = \alpha + \sum_{n=1}^N \phi_n^{(d)}$
 $\beta \propto \sum_{d \in \mathcal{D}} (\phi^{(d)})^{\top}w^{(d)}$ (which corresponds to $\beta_{ij} \propto \sum_{d \in \mathcal{D}} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$)
 
 \While{not converged}{
-$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where $\begin{cases}L'(\alpha) = |D| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
-L''(\alpha) = |D|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases}$
+$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |D| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
+L''(\alpha) = |D|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
 }
 }
 \end{algorithm}
@@ -259,6 +259,7 @@ L''(\alpha) = |D|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases}$
 
 \subsection{Results}
 
+The database we used may be found at the address \url{http://www.daviddlewis.com/resources/testcollections/reuters21578/}.
 
 \section{Conclusion}
 
