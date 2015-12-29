@@ -293,27 +293,18 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \en
 }
 \end{algorithm}
 
-\textbf{Initialization issues}:
+\textbf{Computation of $\gamma^{(d)}$}: With the original formula, we have: $\sum \gamma^{(d)} = N_d\times \alpha + \textnormal{number of words in the document } d$.
+
+%Another formula for $\gamma^{(d)}$:
+%\[ \gamma^{(d)} \leftarrow \gamma^{(d)} + \left( \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d), \text{old}} - w_n^{(d)} \phi_n^{(d), \text{new}} \right) \]
+
+\textbf{Log-likelihood}: $\Gamma(x)$ becomes exponentially big when $x \rightarrow \infty$. We will prefer working with $\ln \Gamma(x)$ (\texttt{gammaln} in scipy) instead of $\Gamma(x)$ (or \texttt{numpy.log(gamma)}).
+
+\textbf{Initialization}:
 \begin{itemize}
-  \item $\alpha$
-  \item $\beta$: random
+  \item $\alpha$ is chosen randomly, but $\alpha \neq 0$.
+  \item $\beta$ is chosen randomly.
 \end{itemize}
-
-\textbf{Log-likelihood}:
-
-\begin{itemize}
-  \item $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta) = -\infty$. This is essentially due to the term $- \log \Gamma \left( \sum_{j=1}^k \gamma_j^{(d)} \right)$, which might become $-\infty$ if $\sum_{j=1}^k \gamma_j^{(d)} > 200$.
-  
-  \item $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta) = \textnormal{not a number}$ if the term $\sum_{i=1}^k \log \Gamma(\gamma_i^{(d)}) = \infty$ and  $- \log \Gamma \left( \sum_{j=1}^k \gamma_j^{(d)} \right) = -\infty$. We are dealing with an undetermined form.
-\end{itemize}
-
-\textbf{Computation of $\gamma^{(d)}$}:
-
-With the original formula, we have: $\sum \gamma^{(d)} = N_d\times \alpha + \textnormal{number of words in the document } d$.
-
-Another formula for $\gamma^{(d)}$:
-
-\[ \gamma^{(d)} \leftarrow \gamma^{(d)} + \left( \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d), \text{old}} - w_n^{(d)} \phi_n^{(d), \text{new}} \right) \]
 
 \subsection{Results}
 
