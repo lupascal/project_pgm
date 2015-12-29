@@ -74,7 +74,7 @@ def variational_inference(document, dirich_param, word_logprob_given_topic,
         
         log_likelihoods.append(log_likelihood)
 
-        if(verbose): print 'log likelihood: %g' %log_likelihood
+        #if(verbose): print 'log likelihood: %g' %log_likelihood
 
     return (var_dirich, np.exp(log_var_multinom),
             log_likelihoods)
@@ -172,7 +172,6 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     # var_dirich
     sum_psi_var_dirich = 0 # will be used for the gradient of L wrt dirich_param
 
-    
     # corpus log_likelihood    
     corpus_log_likelihood = 0
     
@@ -180,7 +179,7 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     for (index, document) in enumerate(corpus):
         # E-step
         (var_dirich, var_multinom, log_likelihoods) = variational_inference(
-            document, np.log(old_dirich), np.log(old_word_proba))
+            document, old_dirich, np.log(old_word_proba))
         log_likelihood = log_likelihoods[-1]
         
         # update corpus_log_likelihood
@@ -190,10 +189,10 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
                 += document[:,1][:,np.newaxis] * var_multinom
         
             # update sum_psi_var_dirich
+            print np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
             sum_psi_var_dirich += np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
-            #print np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
             
-            #print log_likelihood
+            print log_likelihood
             corpus_log_likelihood += log_likelihood
     
     print 'corpus_log_likelihood', corpus_log_likelihood

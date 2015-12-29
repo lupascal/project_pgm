@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.10.3)  29 DEC 2015 16:13
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.10.3)  29 DEC 2015 19:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -656,7 +656,11 @@ Package: subcaption 2013/02/03 v1.1-62 Sub-captions (AR)
 \c@subfigure=\count167
 \c@subtable=\count168
 )
-(./rapport_PGM.aux)
+(./rapport_PGM.aux
+
+LaTeX Warning: Label `generative' multiply defined.
+
+)
 \openout1 = `rapport_PGM.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
@@ -677,8 +681,7 @@ LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
 LaTeX Font Info:    ... okay on input line 35.
 \AtBeginShipoutBox=\box46
 Package hyperref Info: Link coloring ON on input line 35.
-
-(/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/nameref.sty
+ (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 
 (/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
@@ -694,13 +697,10 @@ LaTeX Info: Redefining \nameref on input line 35.
 \@outlinefile=\write5
 \openout5 = `rapport_PGM.out'.
 
-
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
-
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Try loading font information for U+msa on input line 38.
+
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
@@ -736,14 +736,7 @@ File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 49.
-
-
-LaTeX Warning: Citation `BNJ03' on page 1 undefined on input line 58.
-
-
-LaTeX Warning: Citation `BNJ03' on page 1 undefined on input line 109.
-
-[1
+ [1
 
 ] [2]
 Overfull \hbox (26.73955pt too wide) in paragraph at lines 222--222
@@ -755,37 +748,35 @@ Underfull \vbox (badness 1910) has occurred while \output is active []
 
  [3]
 [4]
-Underfull \hbox (badness 1460) in paragraph at lines 309--310
+Underfull \hbox (badness 1460) in paragraph at lines 307--308
 []$\OML/cmm/m/it/10 L\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 ^^M[]; ^^^[]; ^^K; ^^L\O
 T1/cmr/m/n/10 ) = []$ if the term $[][] [] ^^@(\OML/cmm/m/it/10 ^^M[]\OT1/cmr/m
 /n/10 ) = \OMS/cmsy/m/n/10 1$ \OT1/cmr/m/n/10 and
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 323.
 [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 323.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 329.
+ [6]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 329.
  (./rapport_PGM.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 323.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 323.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 329.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 329.
 
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 
-LaTeX Warning: There were undefined references.
+LaTeX Warning: There were multiply-defined labels.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 323.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 329.
  ) 
 Here is how much of TeX's memory you used:
- 20326 strings out of 493706
- 324285 string characters out of 6145769
+ 20329 strings out of 493706
+ 324309 string characters out of 6145769
  452937 words of memory out of 5000000
- 23384 multiletter control sequences out of 15000+600000
+ 23387 multiletter control sequences out of 15000+600000
  16546 words of font info for 64 fonts, out of 8000000 for 9000
  1328 hyphenation exceptions out of 8191
  53i,24n,92p,628b,699s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on rapport_PGM.pdf (5 pages).
+Output written on rapport_PGM.pdf (6 pages).
