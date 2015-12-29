@@ -21,7 +21,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
         (dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood) \
             = maximization_step(corpus, dirich_param, word_proba_given_topic)
 
-        #print 'log likelihood: %g' %corpus_log_likelihood
+        print 'log likelihood: %g' %corpus_log_likelihood
     
     return dirich_param, word_proba_given_topic, var_dirich
 
@@ -47,7 +47,7 @@ def variational_inference(document, dirich_param, word_logprob_given_topic,
     
     while(not stop(log_likelihood)):
 
-        log_var_multinom_old = log_var_multinom
+        #log_var_multinom_old = log_var_multinom
         
         # compute new var_multinom
         log_var_multinom = np.transpose(
@@ -171,7 +171,7 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     
     # var_dirich
     sum_psi_var_dirich = 0 # will be used for the gradient of L wrt dirich_param
-    var_dirich = np.empty([num_docs, nb_topics])
+
     
     # corpus log_likelihood    
     corpus_log_likelihood = 0
@@ -179,20 +179,25 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     # for each document and its corresponding var_dirich (gamma) and var_multinom (phi)
     for (index, document) in enumerate(corpus):
         # E-step
-        (var_dirich[index,:], var_multinom, log_likelihood) = variational_inference(
+        (var_dirich, var_multinom, log_likelihoods) = variational_inference(
             document, np.log(old_dirich), np.log(old_word_proba))
-
-        # update word_proba_given_topic (beta) of the M-step
-        np.transpose(word_proba_given_topic)[document[:,0]] \
-            += document[:,1][:,np.newaxis] * var_multinom
-        
-        # update sum_psi_var_dirich
-        sum_psi_var_dirich += np.sum(psi(var_dirich[index,:]) 
-                     - psi(np.sum(var_dirich[index,:])))
+        log_likelihood = log_likelihoods[-1]
         
         # update corpus_log_likelihood
-        corpus_log_likelihood += log_likelihood
+        if not ((np.isinf(log_likelihood)) or (np.isnan(log_likelihood))):
+            # update word_proba_given_topic (beta) of the M-step
+            np.transpose(word_proba_given_topic)[document[:,0]] \
+                += document[:,1][:,np.newaxis] * var_multinom
+        
+            # update sum_psi_var_dirich
+            sum_psi_var_dirich += np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
+            #print np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
+            
+            #print log_likelihood
+            corpus_log_likelihood += log_likelihood
     
+    print 'corpus_log_likelihood', corpus_log_likelihood
+        
     # normalization of word_proba_given_topic
     normalizing_constant = np.sum(word_proba_given_topic, axis = 1)
     assert(normalizing_constant.all())

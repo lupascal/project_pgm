@@ -5,11 +5,11 @@ import doc_preprocessing as dp
 import variational_inference as vi
 reload(vi)
 
-# path_to_reuters = path.expanduser(
-#     '/home/student/probabilistic_graphical_models/project_pgm/src/reuters21578/')
-
 path_to_reuters = path.expanduser(
-   '~/Documents/MVA/proba_graph_models/project/reuters_21578')
+     '/home/student/probabilistic_graphical_models/project_pgm/src/reuters21578/')
+
+#path_to_reuters = path.expanduser(
+#   '~/Documents/MVA/proba_graph_models/project/reuters_21578')
 
 def test_variational_inference(voc = None, docs = None,
                                max_files = None, doc_num = None, n_topics = 30,
@@ -38,4 +38,4 @@ def test_variational_inference(voc = None, docs = None,
 
     plt.plot(log_likelihoods)
 
-    #vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
+    vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
