@@ -2,48 +2,17 @@
 % Jacobs Landscape Poster
 % LaTeX Template
 % Version 1.1 (14/06/14)
-%
-% Created by:
-% Computational Physics and Biophysics Group, Jacobs University
-% https://teamwork.jacobs-university.de:8443/confluence/display/CoPandBiG/LaTeX+Poster
-% 
-% Further modified by:
-% Nathaniel Johnston (nathaniel@njohnston.ca)
-%
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
-
 \documentclass[final]{beamer}
-
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
-
 \usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
-
 \usetheme{confposter} % Use the confposter theme supplied with this template
-
 \setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
 \setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
 \setbeamercolor{block alerted title}{fg=white,bg=dblue!70} % Colors of the highlighted block titles
 \setbeamercolor{block alerted body}{fg=black,bg=dblue!10} % Colors of the body of highlighted blocks
-% Many more colors are available for use in beamerthemeconfposter.sty
-
-%-----------------------------------------------------------
-% Define the column widths and overall poster size
-% To set effective sepwid, onecolwid and twocolwid values, first choose how many columns you want and how much separation you want between columns
-% In this template, the separation width chosen is 0.024 of the paper width and a 4-column layout
-% onecolwid should therefore be (1-(# of columns+1)*sepwid)/# of columns e.g. (1-(4+1)*0.024)/4 = 0.22
-% Set twocolwid to be (2*onecolwid)+sepwid = 0.464
-% Set threecolwid to be (3*onecolwid)+2*sepwid = 0.708
 
 \newlength{\sepwid}
 \newlength{\onecolwid}
@@ -56,26 +25,14 @@
 \setlength{\twocolwid}{0.464\paperwidth} % Width of two columns
 \setlength{\threecolwid}{0.708\paperwidth} % Width of three columns
 \setlength{\topmargin}{-0.5in} % Reduce the top margin size
-%-----------------------------------------------------------
 
 \usepackage{graphicx}  % Required for including images
-
 \usepackage{booktabs} % Top and bottom rules for tables
-
-%----------------------------------------------------------------------------------------
-%	TITLE SECTION 
-%----------------------------------------------------------------------------------------
-
-\title{Latent Dirichlet Allocation} % Poster title
-
-\author{J\'er\^ome DOCK\`ES, Pascal LU} % Author(s)
-
-\institute{\'Ecole Normale Sup\'erieure de Cachan $-$ \today} % Institution(s)
-
-%----------------------------------------------------------------------------------------
-
 \usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
 
+\title{Latent Dirichlet Allocation} % Poster title
+\author{J\'er\^ome DOCK\`ES, Pascal LU} % Author(s)
+\institute{\'Ecole Normale Sup\'erieure de Cachan $-$ \today} % Institution
 
 \begin{document}
 
@@ -98,15 +55,7 @@
 %----------------------------------------------------------------------------------------
 
 \begin{alertblock}{Objectives}
-
-Lorem ipsum dolor sit amet, consectetur, nunc tellus pulvinar tortor, commodo eleifend risus arcu sed odio:
-\begin{itemize}
-\item Mollis dignissim, magna augue tincidunt dolor, interdum vestibulum urna
-\item Sed aliquet luctus lectus, eget aliquet leo ullamcorper consequat. Vivamus eros sem, iaculis ut euismod non, sollicitudin vel orci.
-\item Nascetur ridiculus mus.  
-\item Euismod non erat. Nam ultricies pellentesque nunc, ultrices volutpat nisl ultrices a.
-\end{itemize}
-
+We consider the problem of modeling text corpora. The goal is to find short descriptions of the members of a collection that enable efficient processing of large collections while preserving the essential statistical relationships that are useful for basic tasks such as classification, novelty detection, summarization, and similarity and relevance judgments  \cite{BNJ03}.
 \end{alertblock}
 
 %----------------------------------------------------------------------------------------
@@ -115,10 +64,49 @@ Lorem ipsum dolor sit amet, consectetur, nunc tellus pulvinar tortor, commodo el
 
 \begin{block}{Presentation of the model}
 
-Lorem ipsum dolor \textbf{sit amet}, consectetur adipiscing elit. Sed commodo molestie porta. Sed ultrices scelerisque sapien ac commodo. Donec ut volutpat elit. Sed laoreet accumsan mattis. Integer sapien tellus, auctor ac blandit eget, sollicitudin vitae lorem. Praesent dictum tempor pulvinar. Suspendisse potenti. Sed tincidunt varius ipsum, et porta nulla suscipit et. Etiam congue bibendum felis, ac dictum augue cursus a. \textbf{Donec} magna eros, iaculis sit amet placerat quis, laoreet id est. In ut orci purus, interdum ornare nibh. Pellentesque pulvinar, nibh ac malesuada accumsan, urna nunc convallis tortor, ac vehicula nulla tellus eget nulla. Nullam lectus tortor, \textit{consequat tempor hendrerit} quis, vestibulum in diam. Maecenas sed diam augue.
+\begin{itemize}
+  \item $\mathcal{D} = \{d_{1},d_{2}, \ldots, d_{M}\}$ is a corpus.
+  \item $\mathcal{V}$ is the vocabulary of size $V$.
+  \item $k$ is the number of topics.
+\end{itemize}
 
-This statement requires citation \cite{BNJ03}.
+For a document $d \in \mathcal{D}$,
+\begin{itemize}  
+  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all distinct. $N_d$ is the number of \textbf{distinct} words in the document $d$.
+  \item $w^{(d)}$ (\texttt{word$\_$incidences}) is a matrix containing the number of times each word in the vocabulary appears in the document. Size of $w^{(d)}$ = $N_d \times V$.
+ \item $\theta^{(d)}$ is an array of size $k$, representing a probability density.
+ \item $z^{(d)}$ is the set of topics : $z_{ni}^{(d)} =  1$ if the word $n$ is linked with the topic $i$. Size of $z^{(d)}$ $= N_d \times k$.
+\end{itemize}
 
+\medskip
+
+Latent Dirichlet allocation (LDA) is a generative probabilistic model of a corpus. 
+\begin{itemize}
+  \item Documents = random mixtures over latent topics,
+  \item Topic = a distribution over words. 
+\end{itemize} 
+
+\medskip
+
+\begin{itemize}
+  \item \textbf{Input}: {corpus $\mathcal{D}$}
+\end{itemize}
+
+For {\emph{each document} $d \in \mathcal{D}$}{
+
+\quad Choose $N \sim \textnormal{Poisson}(\xi)$
+
+\quad Choose $\theta^{(d)} \sim \textnormal{Dir}(\alpha)$
+
+\quad For {\emph{each of the $N$ words $w_n^{(d)}$}}{
+
+\quad\quad Choose a topic $z_n^{(d)} \sim  \textnormal{Multinomial}(\theta^{(d)})$
+
+\quad\quad Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multi-
+
+\quad\quad nomial probability conditioned on $z_n^{(d)}$.
+}
+}
 \end{block}
 
 \end{column} % End of the first column
@@ -135,9 +123,34 @@ This statement requires citation \cite{BNJ03}.
 %	MATERIALS
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Variational inference}
+\begin{block}{Generative model}
+\textbf{Goal}: determine
 
+\begin{itemize}
+\item $\alpha$ = estimate of the parameter of the Dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. Size of $\alpha = k$.
+\item $\beta$ is a matrix of size $k \times V$ which gives the estimated probability that a given topic will generate a certain word: $\beta_{ij}= p(w^j = 1 | z^i = 1)$.
+\end{itemize}
 
+\begin{figure}[ht!]
+\begin{center}
+\psset{xunit=3cm,yunit=3cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
+\begin{pspicture*}(-0.5,-0.3)(8,3.5)
+\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
+\rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
+\rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
+\rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
+\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
+\pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
+\pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
+\psline{->}(0.27,1)(1.58,1)
+\psline{->}(2.43,1)(3.58,1)
+\psline{->}(4.44,1)(5.5,1)
+\psline{->}(6,2.7)(6,1.5)
+\rput(6.75,0.5){$N_d$}
+\rput(7.5,0.25){$M$}
+\end{pspicture*}
+\end{center}
+\end{figure}
 \end{block}
 
 %----------------------------------------------------------------------------------------
@@ -207,30 +220,19 @@ While {\emph{the expected log-likelihood for the document $d$ has not converged}
 %	MATHEMATICAL SECTION
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Graphical Models}
+\begin{block}{Variational inference}
 
-\begin{figure}[ht!]
-\begin{center}
-\psset{xunit=3cm,yunit=3cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
-\begin{pspicture*}(-0.5,-0.3)(8,3.5)
-\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
-\rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
-\rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
-\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
-\pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
-\pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
-\psline{->}(0.27,1)(1.58,1)
-\psline{->}(2.43,1)(3.58,1)
-\psline{->}(4.44,1)(5.5,1)
-\psline{->}(6,2.7)(6,1.5)
-\rput(6.75,0.5){$N_d$}
-\rput(7.5,0.25){$M$}
-\end{pspicture*}
-\caption{Generative model}
-\label{generative}
-\end{center}
-\end{figure}
+$\Rightarrow$ Use Jensen's inequality to obtain a lower bound on the log likelihood.
+
+For a document $d \in \mathcal{D}$:
+ \begin{itemize}
+  \item $\gamma^{(d)}$ is the variational parameter for the dirichlet distribution. Size of $\gamma^{(d)}$ = $k$.
+  \item $\phi^{(d)}$ is the variational parameter for the multinomial distribution. Size of $\phi^{(d)}$ = $N_d \times k$.
+  
+  $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
+   \end{itemize}
+
+$\Rightarrow$ Estimate $\gamma^{(d)}, \phi_{ni}^{(d)}$ instead of $\theta^{(d)}$ and $z_n^{(d)}$.
 
 \begin{figure}
 \begin{center}
@@ -247,8 +249,6 @@ While {\emph{the expected log-likelihood for the document $d$ has not converged}
 \rput(2.75,0.5){$N_d$}
 \rput(3.5,0.25){$M$}
 \end{pspicture*}
-\caption{Variational model}
-\label{variational}
 \end{center}
 \end{figure}
 
@@ -302,8 +302,11 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{
 \end{block}
 
 \begin{block}{Implementation issues}
-
-
+\begin{itemize}
+  \item Initialization of $\alpha$ et $\beta$.
+  \item Optimization and convergence of the parameters / log-likelihood
+  \item 
+\end{itemize}
 \end{block}
 
 %----------------------------------------------------------------------------------------
