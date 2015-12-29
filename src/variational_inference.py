@@ -4,7 +4,7 @@ Blei, Ng, and Jordan. Latent Dirichlet Allocation (2003).
 """
 
 import numpy as np
-from scipy.special import psi, polygamma, gamma
+from scipy.special import psi, polygamma, gammaln
 from scipy.misc import logsumexp
 
 
@@ -114,8 +114,8 @@ def compute_log_likelihood(word_incidences, dirich_param,
 
     nb_topics = np.size(word_logproba_given_topic, axis = 0)
 
-    log_likelihood = (np.log(gamma(nb_topics*dirich_param))
-                      - nb_topics*np.log(gamma(dirich_param))
+    log_likelihood = (gammaln(nb_topics*dirich_param)
+                      - nb_topics*gammaln(dirich_param)
                       + (dirich_param-1)*np.sum(psi(var_dirich)
                                                      - psi(np.sum(var_dirich)))
                       
@@ -125,8 +125,8 @@ def compute_log_likelihood(word_incidences, dirich_param,
                                * np.transpose(var_multinom)
                                * word_incidences)
                       
-                      - np.log(gamma(np.sum(var_dirich))) 
-                      + np.sum(np.log(gamma(var_dirich)))
+                      - gammaln(np.sum(var_dirich)) 
+                      + np.sum(gammaln(var_dirich))
                       - np.sum((var_dirich - 1) * psi(var_dirich)
                                - psi(np.sum(var_dirich)))
                     
@@ -228,7 +228,7 @@ def maximization_step(corpus, old_dirich, log_old_word_proba,
         dirich_param = dirich_param - coefficient
         
         error = np.abs(coefficient)
-        print error
+        print 'error: %g' % error
     
     return (dirich_param, word_logproba_given_topic, var_dirich,
             corpus_log_likelihood)
