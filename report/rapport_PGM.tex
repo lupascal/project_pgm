@@ -235,7 +235,7 @@ $\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
 }
 normalize $\phi_n^{(d)}$ to sum to $1$.
 }
-$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} \phi_n^{(d)}$
+$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
 }
 }
 \end{algorithm}
@@ -249,7 +249,7 @@ $\beta \propto \sum_{d \in \mathcal{D}} (\phi^{(d)})^{\top}w^{(d)}$ (which corre
 
 \While{\emph{$\alpha$ has not converged}}{
 $\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
-L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
+L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
 }
 }
 \end{algorithm}
@@ -274,24 +274,33 @@ Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 Initialize \texttt{sum$\_$psi$\_$var$\_$dirich} ($\Sigma_{\gamma}$) = 0 \;
 \bigskip
 
-\While{\emph{the expected log-likelihood has not converged}}{
+\While{\emph{the expected log-likelihood $L(\mathcal{D}, \alpha, \beta)$ has not converged}}{
+Initialize expected log-likelihood $L(\mathcal{D}, \alpha, \beta) = 0$ \;
 \For{\emph{each} $d \in \mathcal{D}$}{
 \texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{E-step} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)
 
 Update $\beta \leftarrow \beta +  (\phi^{(d)})^{\top}w^{(d)}$ \;
 Update $\Sigma_{\gamma} \leftarrow \Sigma_{\gamma} + \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) $ \;
+Update $L(\mathcal{D}, \alpha, \beta) \leftarrow L(\mathcal{D}, \alpha, \beta) + L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$\;
 }
 
 Normalize $\beta$ \;
 
 \While{\emph{$\alpha$ has not converged}}{
 $\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where $\begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \Sigma_{\gamma} \\
-L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases}$
+L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \end{cases}$
 
 }
 }
 }
 \end{algorithm}
+
+\textbf{Initialization issues}:
+\begin{itemize}
+  \item $\alpha$
+  \item $\beta$: random
+\end{itemize}
+
 
 \subsection{Results}
 
