@@ -56,7 +56,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
     #print 'log_var_dirich_document:', log_var_dirich_document
     
     log_likelihood = None
-    stop = var_inf_stop(threshold = 1e-3, max_iter = 30)
+    stop = var_inf_stop(threshold = 1e-3, max_iter = 10)
     log_likelihoods = []
 
     while(not stop(log_likelihood)):
@@ -88,7 +88,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
     if (save_log_likelihoods):
         return var_dirich_document, np.exp(log_var_multinom_document), log_likelihoods
     
-    return var_dirich_document, np.exp(log_var_multinom_document)
+    return var_dirich_document, np.exp(log_var_multinom_document), log_likelihood
 
 
 # compute the log-likehood for one document
@@ -129,7 +129,7 @@ def compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic
 
     #print '4 = ', -np.sum(var_multinom * np.log(var_multinom))
     
-    #print 'var_dirich = ', var_dirich  
+    #print 'var_dirich = ', var_dirich
     #print 'sum_var_dirich = ', np.sum(var_dirich)
     #print gamma(np.sum(var_dirich))  # infini
 
@@ -152,11 +152,14 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
     # var_dirich
     sum_psi_var_dirich = 0 # will be used for the gradient of L wrt dirich_param
     var_dirich = np.empty([num_docs, nb_topics])
-
+    
+    # corpus log_likelihood    
+    corpus_log_likelihood = 0
+    
     # for each document and its corresponding var_dirich (gamma) and var_multinom (phi)
     for (index, document) in enumerate(corpus):
         # E-step
-        (var_dirich[index,:], var_multinom) = variational_inference(
+        (var_dirich[index,:], var_multinom, log_likelihood) = variational_inference(
             document, np.log(old_dirich), np.log(old_word_proba))
 
         # update word_proba_given_topic (beta) of the M-step
@@ -167,6 +170,10 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
         sum_psi_var_dirich += np.sum(psi(var_dirich[index,:]) 
                      - psi(np.sum(var_dirich[index,:])))
         
+        # update corpus_log_likelihood
+        corpus_log_likelihood += log_likelihood
+    
+    # normalization of word_proba_given_topic
     normalizing_constant = np.sum(word_proba_given_topic, axis = 1)
     assert(normalizing_constant.all())
     word_proba_given_topic /= normalizing_constant[:,np.newaxis]
@@ -188,11 +195,6 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
         error = np.abs(coefficient)
         print error
     
-    # compute the corpus log-likelihood
-    corpus_log_likelihood = compute_corpus_log_likelihood(corpus, dirich_param,
-                                                   word_proba_given_topic,
-                                                   var_dirich, var_multinom, nb_topics)
-
     return dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood
 
 
@@ -209,17 +211,6 @@ def compute_hessian_wrt_dirich_param(dirich_param, num_docs, num_topics):
               * (num_topics*polygamma(1, num_topics*dirich_param)
               - polygamma(1, num_topics*dirich_param) ) )
     return hessian
-
-
-# Compute the log-likelihood for the corpus
-def compute_corpus_log_likelihood(corpus, dirich_param, word_proba_given_topic,
-                                  var_dirich, var_multinom, nb_topics):
-    log_likelihood = 0
-    for i in range(corpus):
-        incident_words, word_incidences = np.transpose(corpus[i])
-        log_likelihood += compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic,
-                                                 var_dirich, var_multinom[i], nb_topics)
-    return log_likelihood
 
 ########################################################################################
 
