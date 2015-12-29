@@ -74,7 +74,7 @@ def variational_inference(document, dirich_param, word_logprob_given_topic,
         
         log_likelihoods.append(log_likelihood)
 
-        if(verbose): print 'log likelihood: %g' %log_likelihood
+        #if(verbose): print 'log likelihood: %g' %log_likelihood
 
     return (var_dirich, log_var_multinom,
             log_likelihoods)
@@ -196,12 +196,9 @@ def maximization_step(corpus, old_dirich, log_old_word_proba,
                             axis = 0)
         
             # update sum_psi_var_dirich
-            print 'log likelihood: %g' % log_likelihood
-            
             sum_psi_var_dirich += np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
-            #print np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
             
-            #print log_likelihood
+            print log_likelihood
             corpus_log_likelihood += log_likelihood
 
         else: print 'warning: inf encountered in variational inference'

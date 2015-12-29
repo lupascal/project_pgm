@@ -227,7 +227,7 @@ L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
 \KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
 \Begin{
 Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
-Initialize $\gamma_i^{(d)} = \alpha + \frac{N_d}{k}$ for all $i$ \;
+Initialize $\gamma_i^{(d)} = \alpha + \frac{1}{k}\sum_{n=1}^{N_d} w_n^{(d)}$ for all $i$ \;
 \While{\emph{the expected log-likelihood for the document $d$ has not converged}}{
 \For{$n=1\ldots N_d$}{
 \For{$i=1\ldots k$}{
@@ -309,7 +309,11 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \en
 
 \textbf{Computation of $\gamma^{(d)}$}:
 
-\[ \gamma^{(d)} \leftarrow \gamma^{(d)} + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
+With the original formula, we have: $\sum \gamma^{(d)} = N_d\times \alpha + \textnormal{number of words in the document } d$.
+
+Another formula for $\gamma^{(d)}$:
+
+\[ \gamma^{(d)} \leftarrow \gamma^{(d)} + \left( \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d), \text{old}} - w_n^{(d)} \phi_n^{(d), \text{new}} \right) \]
 
 \subsection{Results}
 
