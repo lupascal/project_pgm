@@ -11,28 +11,28 @@ from scipy.misc import logsumexp
 # EM algorithm
 def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
     # initialization
-    (dirich_param, word_proba_given_topic) \
+    (dirich_param, word_logproba_given_topic) \
         = initialize_params(corpus, nb_topics, voc_size)
     converged = var_inf_stop(max_iter = 10)
     corpus_log_likelihood = None
 
     while(not converged(corpus_log_likelihood)):
         # M-step (we compute the E-step in the M-step)
-        (dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood) \
-            = maximization_step(corpus, dirich_param, word_proba_given_topic)
+        (dirich_param, word_logproba_given_topic, var_dirich, corpus_log_likelihood) \
+            = maximization_step(corpus, dirich_param, word_logproba_given_topic)
 
         print 'log likelihood: %g' %corpus_log_likelihood
     
-    return dirich_param, word_proba_given_topic, var_dirich
+    return dirich_param, word_logproba_given_topic, var_dirich
 
 
 # initialization
 def initialize_params(corpus, nb_topics, voc_size):
     dirich_param = np.random.rand()
-    word_proba_given_topic = np.random.rand(nb_topics, voc_size)
-    word_proba_given_topic /= np.sum(word_proba_given_topic, 
+    word_logproba_given_topic = np.log(np.random.rand(nb_topics, voc_size))
+    word_logproba_given_topic -= logsumexp(word_logproba_given_topic, 
                                      axis = 1)[:, np.newaxis]
-    return dirich_param, word_proba_given_topic
+    return dirich_param, word_logproba_given_topic
 
 
 ######################################################################
@@ -76,7 +76,7 @@ def variational_inference(document, dirich_param, word_logprob_given_topic,
 
         #if(verbose): print 'log likelihood: %g' %log_likelihood
 
-    return (var_dirich, np.exp(log_var_multinom),
+    return (var_dirich, log_var_multinom,
             log_likelihoods)
     
 
@@ -161,46 +161,54 @@ def compute_log_likelihood(word_incidences, dirich_param,
 # corresponds to the M-step
 # arguments: corpus, old_dirich (alpha), old_word_proba (beta)
 # returns new dirich_param, new word_prob_given_topic
-def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold = .1):
+def maximization_step(corpus, old_dirich, log_old_word_proba,
+                      convergence_threshold = .1):
 
     num_docs = len(corpus)
-    nb_topics = np.shape(old_word_proba)[0]
+    nb_topics = np.shape(log_old_word_proba)[0]
 
     # compute word_prob_given_topic (beta)
-    word_proba_given_topic = np.zeros(np.shape(old_word_proba))
+    word_logproba_given_topic = np.zeros(np.shape(log_old_word_proba))
     
     # var_dirich
     sum_psi_var_dirich = 0 # will be used for the gradient of L wrt dirich_param
-
+    
     # corpus log_likelihood    
     corpus_log_likelihood = 0
     
     # for each document and its corresponding var_dirich (gamma) and var_multinom (phi)
     for (index, document) in enumerate(corpus):
         # E-step
-        (var_dirich, var_multinom, log_likelihoods) = variational_inference(
-            document, old_dirich, np.log(old_word_proba))
+        (var_dirich, log_var_multinom, log_likelihoods) = variational_inference(
+            document, old_dirich, log_old_word_proba, verbose = False)
         log_likelihood = log_likelihoods[-1]
         
         # update corpus_log_likelihood
-        if not ((np.isinf(log_likelihood)) or (np.isnan(log_likelihood))):
+        assert (not np.isnan(log_likelihood)), \
+                'nan encountered in variational inference'
+        
+        if (not (np.isinf(log_likelihood))):
             # update word_proba_given_topic (beta) of the M-step
-            np.transpose(word_proba_given_topic)[document[:,0]] \
-                += document[:,1][:,np.newaxis] * var_multinom
+            np.transpose(word_logproba_given_topic)[document[:,0]] \
+                = logsumexp([
+                    np.transpose(word_logproba_given_topic)[document[:,0]],
+                    np.log(document[:,1][:,np.newaxis]) + log_var_multinom],
+                            axis = 0)
         
             # update sum_psi_var_dirich
-            print np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
             sum_psi_var_dirich += np.sum(psi(var_dirich) - psi(np.sum(var_dirich)))
             
             print log_likelihood
             corpus_log_likelihood += log_likelihood
+
+        else: print 'warning: inf encountered in variational inference'
     
-    print 'corpus_log_likelihood', corpus_log_likelihood
+    print 'corpus_log_likelihood %g' % corpus_log_likelihood
         
     # normalization of word_proba_given_topic
-    normalizing_constant = np.sum(word_proba_given_topic, axis = 1)
+    normalizing_constant = logsumexp(word_logproba_given_topic, axis = 1)
     assert(normalizing_constant.all())
-    word_proba_given_topic /= normalizing_constant[:,np.newaxis]
+    word_logproba_given_topic -= normalizing_constant[:,np.newaxis]
 
     # M-step: compute dirich_param (alpha)
     dirich_param = old_dirich
@@ -219,7 +227,8 @@ def maximization_step(corpus, old_dirich, old_word_proba, convergence_threshold 
         error = np.abs(coefficient)
         print error
     
-    return dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood
+    return (dirich_param, word_logproba_given_topic, var_dirich,
+            corpus_log_likelihood)
 
 
 # Compute the gradient of the expected log-likelihood wrt dirich_param
