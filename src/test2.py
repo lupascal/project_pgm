@@ -11,7 +11,7 @@ path_to_reuters = path.expanduser(
 #path_to_reuters = path.expanduser(
 #  '~/Documents/MVA/proba_graph_models/project/reuters_21578')
 
-def test_variational_inference(voc = None, docs = None,
+def test_variational_inference_2(voc = None, docs = None,
                                max_files = None, doc_num = None, n_topics = 30,
                                dirich_param = .5,
                                log_word_proba_given_topic = None,

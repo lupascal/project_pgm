@@ -12,7 +12,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
     # initialization
     (dirich_param, word_logproba_given_topic) \
         = initialize_params(corpus, nb_topics, voc_size)
-    converged = var_inf_stop(threshold = 1e-4, max_iter = 100)
+    converged = var_inf_stop(threshold = 1e-4, max_iter = 15)
     corpus_log_likelihood = None
     log_likelihoods = []
     

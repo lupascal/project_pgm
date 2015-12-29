@@ -21,7 +21,7 @@ def test_variational_inference(voc = None, docs = None,
     if(voc == None or docs == None):
         #voc, docs = dp.build_voc(dp.find_reuters_files(path_to_reuters)[:max_files])
         voc, docs = dp.build_voc([path.join(path_to_reuters,
-                                            'reuters_short.sgm')])
+                                            'reut2-000.sgm')])
         print voc.keys()[:10]
 
     voc_size = len(voc)
@@ -41,11 +41,15 @@ def test_variational_inference(voc = None, docs = None,
     var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
         docs[doc_num], dirich_param, log_word_proba_given_topic, **kwargs)
 
-    plt.plot(log_likelihoods)
+    #plt.plot(log_likelihoods)
 
-    lda_result = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
+    (dirich_param, word_logproba_given_topic, corpus_log_likelihood) = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
     
-    return (lda_result, voc)
+    plt.plot(corpus_log_likelihood)    
+    
+    top_words = topic_top_words(word_logproba_given_topic, voc, num_words = 10)    
+    
+    return (dirich_param, word_logproba_given_topic, top_words)
 
 def topic_top_words(word_logproba_given_topic, voc, num_words = 10):
 
