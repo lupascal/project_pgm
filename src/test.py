@@ -5,16 +5,16 @@ import doc_preprocessing as dp
 import variational_inference as vi
 reload(vi)
 
-path_to_reuters = path.expanduser(
-    '/home/student/probabilistic_graphical_models/project_pgm/src/reuters21578/')
+# path_to_reuters = path.expanduser(
+#     '/home/student/probabilistic_graphical_models/project_pgm/src/reuters21578/')
 
-#path_to_reuters = path.expanduser(
-#    '~/Documents/MVA/proba_graph_models/project/reuters_21578')
+path_to_reuters = path.expanduser(
+   '~/Documents/MVA/proba_graph_models/project/reuters_21578')
 
 def test_variational_inference(voc = None, docs = None,
                                max_files = None, doc_num = None, n_topics = 30,
-                               dirich_param = None,
-                               word_proba_given_topic = None):
+                               log_dirich_param = None,
+                               log_word_proba_given_topic = None):
 
     if(voc == None or docs == None):
         voc, docs = dp.build_voc(dp.find_reuters_files(path_to_reuters)[:max_files])
@@ -26,7 +26,7 @@ def test_variational_inference(voc = None, docs = None,
         doc_num = np.random.randint(doc_count)
         
     if dirich_param == None:
-        log_dirich_param = np.zeros(n_topics)
+        log_dirich_param = np.log(.5)
 
     if word_proba_given_topic == None:
         log_word_proba_given_topic = np.zeros((n_topics, voc_size)) \

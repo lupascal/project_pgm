@@ -81,8 +81,8 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 
         if (save_log_likelihoods):
             log_likelihoods.append(log_likelihood)
-        #print type(log_likelihood)
-        #print 'log likelihood: %g' %log_likelihood
+
+        print 'log likelihood: %g' %log_likelihood
 
     print '\n'
     if (save_log_likelihoods):
@@ -94,7 +94,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
 # compute the log-likehood for one document
 def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
                            var_dirich, var_multinom, word_incidences, nb_topics):
-    
+
     log_likelihood = (np.log(gamma(nb_topics*dirich_param))
                       - nb_topics*np.log(gamma(dirich_param))
                       + (dirich_param-1)*np.sum((psi(var_dirich)
@@ -110,7 +110,7 @@ def compute_log_likelihood(document, dirich_param, word_proba_given_topic,
                                - psi(np.sum(var_dirich)))
                       -np.sum(var_multinom * np.log(var_multinom))
                       )
-                      
+
     return log_likelihood
 
 
