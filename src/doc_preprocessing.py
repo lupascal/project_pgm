@@ -117,3 +117,11 @@ def most_frequent(voc, docs, nb = 20, to_lower = False):
             frequent_words += [word for word in voc if voc[word] == order[i]]
             
     return frequent_words
+
+
+def reverse_dict(voc):
+    reversed = {}
+    for key in voc:
+        reversed[voc[key]] = key
+
+    return reversed

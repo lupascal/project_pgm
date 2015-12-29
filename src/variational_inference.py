@@ -243,7 +243,7 @@ def maximization_step(corpus, old_dirich, log_old_word_proba,
         dirich_param = dirich_param - coefficient
         
         error = np.abs(coefficient)
-        #print error
+        #print 'error: %g' % error
     
     return (dirich_param, word_logproba_given_topic, corpus_log_likelihood)
 
