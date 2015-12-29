@@ -130,7 +130,7 @@ def compute_log_likelihood(word_incidences, dirich_param,
                       - np.sum((var_dirich - 1) * psi(var_dirich)
                                - psi(np.sum(var_dirich)))
                     
-                      -np.sum(var_multinom * np.log(var_multinom))
+                      - np.sum( xlog(var_multinom) )
                       )
     
     # for debug
@@ -148,7 +148,7 @@ def compute_log_likelihood(word_incidences, dirich_param,
         c2 = + np.sum(gammaln(var_dirich))
         c3 = - np.sum((var_dirich - 1) * psi(var_dirich) - psi(np.sum(var_dirich)))
                     
-        d1 = -np.sum(var_multinom * np.log(var_multinom))
+        d1 = -np.sum( xlog(var_multinom) )
         
         if (np.isnan(a1) or np.isinf(a1)) :
             print 'a1 = ', a1 
@@ -171,6 +171,10 @@ def compute_log_likelihood(word_incidences, dirich_param,
 
     return log_likelihood
 
+def xlog(x):
+    a = x*np.log(x)
+    a = a.flatten()
+    return a[~np.isnan(a)]
 
 ########################################################################################
 
@@ -254,7 +258,7 @@ def maximization_step(corpus, old_dirich, log_old_word_proba,
 def compute_hessian_wrt_dirich_param(dirich_param, num_docs, num_topics):
     hessian = (num_docs*num_topics
               * (num_topics*polygamma(1, num_topics*dirich_param)
-              - polygamma(1, num_topics*dirich_param) ) )
+              - polygamma(1, dirich_param) ) )
     return hessian
 
 ########################################################################################
