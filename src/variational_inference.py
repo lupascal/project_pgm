@@ -19,8 +19,7 @@ def latent_dirichlet_allocation(corpus, nb_topics, voc_size):
     while(not converged(corpus_log_likelihood)):
         # M-step (we compute the E-step in the M-step)
         (dirich_param, word_proba_given_topic, var_dirich, corpus_log_likelihood) \
-            = maximization_step(corpus, dirich_param, 
-                                      word_proba_given_topic, dirich_param, nb_topics)
+            = maximization_step(corpus, dirich_param, word_proba_given_topic)
 
         #print 'log likelihood: %g' %corpus_log_likelihood
     
@@ -40,7 +39,7 @@ def initialize_params(corpus, nb_topics, voc_size):
 
 # corresponds to the E-step
 def variational_inference(document, log_dirich_param, word_logprob_given_topic,
-                          nb_topics, save_log_likelihoods = False):
+                          save_log_likelihoods = False):
 
     incident_words, word_incidences = np.transpose(document)
 
@@ -57,7 +56,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
     #print 'log_var_dirich_document:', log_var_dirich_document
     
     log_likelihood = None
-    stop = var_inf_stop(threshold = 1e-4, max_iter = 30)
+    stop = var_inf_stop(threshold = 1e-3, max_iter = 30)
     log_likelihoods = []
 
     while(not stop(log_likelihood)):
@@ -68,7 +67,7 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
         log_var_multinom_document -= logsumexp(log_var_multinom_document, axis = 1)[:, np.newaxis]
         
         # compute new var_dirich_document
-        var_dirich_document = log_dirich_param + np.sum(
+        var_dirich_document = np.exp(log_dirich_param) + np.sum(
             np.transpose(np.exp(log_var_multinom_document)),
             axis = 1)
         #print np.exp(log_var_dirich_document)
@@ -84,9 +83,8 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
         if (save_log_likelihoods):
             log_likelihoods.append(log_likelihood)
 
-        print '--- log likelihood: %g' %log_likelihood
-        
-    print '\n'
+    print '--- log likelihood: %g' %log_likelihood
+    
     if (save_log_likelihoods):
         return var_dirich_document, np.exp(log_var_multinom_document), log_likelihoods
     
@@ -132,7 +130,7 @@ def compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic
     #print '4 = ', -np.sum(var_multinom * np.log(var_multinom))
     
     #print 'var_dirich = ', var_dirich  
-    #print np.sum(var_dirich)/len(var_dirich)
+    #print 'sum_var_dirich = ', np.sum(var_dirich)
     #print gamma(np.sum(var_dirich))  # infini
 
     return log_likelihood
