@@ -171,11 +171,6 @@ def compute_log_likelihood(word_incidences, dirich_param,
 
     return log_likelihood
 
-def x_log(x):
-    if (x > 0):
-        return x*np.log(x)
-    else: 
-        return 0
 
 ########################################################################################
 
