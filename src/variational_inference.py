@@ -35,66 +35,85 @@ def initialize_params(corpus, nb_topics, voc_size):
     return dirich_param, word_proba_given_topic
 
 
-########################################################################################
+######################################################################
 
 # corresponds to the E-step
-def variational_inference(document, log_dirich_param, word_logprob_given_topic,
-                          save_log_likelihoods = False):
+def variational_inference(document, dirich_param, word_logprob_given_topic,
+                          verbose = True):
+
+    (incident_words, word_incidences, subvoc_size, nb_topics, log_var_multinom,
+     var_dirich, log_likelihood, log_likelihoods, stop) = _var_inf_init(
+         document,dirich_param, word_logprob_given_topic)
+    
+    while(not stop(log_likelihood)):
+
+        log_var_multinom_old = log_var_multinom
+        
+        # compute new var_multinom
+        log_var_multinom = np.transpose(
+            word_logprob_given_topic[:, incident_words]) \
+            + psi(var_dirich)
+
+        log_var_multinom -= logsumexp(log_var_multinom,
+                                               axis = 1)[:, np.newaxis]
+
+        var_dirich = dirich_param + np.sum(
+            word_incidences * np.transpose(np.exp(log_var_multinom)),
+            axis = 1)
+
+        # var_dirich = dirich_param + np.sum(
+        #     word_incidences * np.transpose(np.exp(log_var_multinom)
+        #                                    - np.exp(
+        #                                       log_var_multinom_old)))
+
+        log_likelihood = compute_log_likelihood(
+            word_incidences, dirich_param,
+            word_logprob_given_topic[:, incident_words],
+            var_dirich,
+            np.exp(log_var_multinom))
+        
+        log_likelihoods.append(log_likelihood)
+
+        if(verbose): print 'log likelihood: %g' %log_likelihood
+
+    return (var_dirich, np.exp(log_var_multinom),
+            log_likelihoods)
+    
+
+
+def _var_inf_init(
+        document,dirich_param, word_logprob_given_topic):
 
     incident_words, word_incidences = np.transpose(document)
 
     subvoc_size = np.size(incident_words, axis = 0)
     nb_topics = np.size(word_logprob_given_topic, axis = 0)
     
-    # initialization of phi (var_multinom_document)
-    log_var_multinom_document = np.zeros((subvoc_size, nb_topics)) - np.log(nb_topics)
-    
-    # initialization of gamma (var_dirich_document)
-    var_dirich_document = np.ones(nb_topics)*(np.exp(log_dirich_param) + np.sum(word_incidences) / nb_topics)
-    #var_dirich_document = np.ones(nb_topics)*(np.exp(log_dirich_param) + subvoc_size/nb_topics)
-    #log_var_dirich_document = np.log(var_dirich_document)
-    #print 'log_var_dirich_document:', log_var_dirich_document
-    
+    log_var_multinom = np.zeros((subvoc_size, nb_topics)) \
+                                - np.log(nb_topics)
+
+    var_dirich = np.ones(nb_topics)*(
+        dirich_param + np.sum(word_incidences) / nb_topics)
+
     log_likelihood = None
-    stop = var_inf_stop(threshold = 1e-3, max_iter = 10)
+    
+    stop = var_inf_stop(threshold = 1e-3, max_iter = 300)
     log_likelihoods = []
 
-    while(not stop(log_likelihood)):
-        # compute new var_multinom_document
-        log_var_multinom_document = np.transpose(
-            word_logprob_given_topic[:, incident_words]) + psi(var_dirich_document)
+    return (incident_words, word_incidences, subvoc_size,
+            nb_topics, log_var_multinom, var_dirich, log_likelihood,
+            log_likelihoods, stop)
 
-        log_var_multinom_document -= logsumexp(log_var_multinom_document, axis = 1)[:, np.newaxis]
-        
-        # compute new var_dirich_document
-        print var_dirich_document
-        var_dirich_document = np.exp(log_dirich_param) + np.sum(
-            word_incidences*np.transpose(np.exp(log_var_multinom_document)),
-            axis = 1)
-        
-        # compute log_likelihood
-        log_likelihood = compute_log_likelihood(
-            word_incidences, np.exp(log_dirich_param),
-            np.exp(word_logprob_given_topic[:, incident_words]),
-            var_dirich_document,
-            np.exp(log_var_multinom_document),
-            nb_topics)
-        
-        if (save_log_likelihoods):
-            log_likelihoods.append(log_likelihood)
-
-    print '--- log likelihood: %g' %log_likelihood
-    
-    if (save_log_likelihoods):
-        return var_dirich_document, np.exp(log_var_multinom_document), log_likelihoods
-    
-    return var_dirich_document, np.exp(log_var_multinom_document), log_likelihood
 
 
 # compute the log-likehood for one document
-def compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic,
-                           var_dirich, var_multinom, nb_topics):
-    
+
+def compute_log_likelihood(word_incidences, dirich_param,
+                           word_logproba_given_topic,
+                           var_dirich, var_multinom):
+
+    nb_topics = np.size(word_logproba_given_topic, axis = 0)
+
     log_likelihood = (np.log(gamma(nb_topics*dirich_param))
                       - nb_topics*np.log(gamma(dirich_param))
                       + (dirich_param-1)*np.sum(psi(var_dirich)
@@ -102,7 +121,7 @@ def compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic
                       
                       + np.sum(var_multinom * (psi(var_dirich) - psi(np.sum(var_dirich))))
                       
-                      + np.sum(np.log(word_proba_given_topic)
+                      + np.sum(word_logproba_given_topic
                                * np.transpose(var_multinom)
                                * word_incidences)
                       
@@ -113,6 +132,7 @@ def compute_log_likelihood(word_incidences, dirich_param, word_proba_given_topic
                     
                       -np.sum(var_multinom * np.log(var_multinom))
                       )
+
     
     #print '--- log-likelihood ---'
     #print '1-a = ', (np.log(gamma(nb_topics*dirich_param)))
