@@ -50,8 +50,8 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
     log_var_multinom_document = np.zeros((subvoc_size, nb_topics)) - np.log(nb_topics)
     
     # initialization of gamma (var_dirich_document)
-    #var_dirich_document = np.exp(log_dirich_param) + np.sum(word_incidences) / nb_topics
-    var_dirich_document = np.ones(nb_topics)*(np.exp(log_dirich_param) + subvoc_size/nb_topics)
+    var_dirich_document = np.ones(nb_topics)*(np.exp(log_dirich_param) + np.sum(word_incidences) / nb_topics)
+    #var_dirich_document = np.ones(nb_topics)*(np.exp(log_dirich_param) + subvoc_size/nb_topics)
     #log_var_dirich_document = np.log(var_dirich_document)
     #print 'log_var_dirich_document:', log_var_dirich_document
     
@@ -67,10 +67,10 @@ def variational_inference(document, log_dirich_param, word_logprob_given_topic,
         log_var_multinom_document -= logsumexp(log_var_multinom_document, axis = 1)[:, np.newaxis]
         
         # compute new var_dirich_document
+        print var_dirich_document
         var_dirich_document = np.exp(log_dirich_param) + np.sum(
-            np.transpose(np.exp(log_var_multinom_document)),
+            word_incidences*np.transpose(np.exp(log_var_multinom_document)),
             axis = 1)
-        #print np.exp(log_var_dirich_document)
         
         # compute log_likelihood
         log_likelihood = compute_log_likelihood(

@@ -23,19 +23,22 @@ def test_variational_inference(voc = None, docs = None,
 
     if doc_num == None:
         doc_count = len(docs)
-        doc_num = np.random.randint(doc_count)
+        doc_num = 0 #np.random.randint(doc_count)
         
     if dirich_param == None:
-        log_dirich_param = 0
+        log_dirich_param = np.log(1)
 
     if word_proba_given_topic == None:
         log_word_proba_given_topic = np.zeros((n_topics, voc_size)) \
                                      - np.log(voc_size) 
-
+        #word_proba_given_topic = np.random.rand(n_topics, voc_size)
+        #word_proba_given_topic /= np.sum(word_proba_given_topic, axis = 1)[:, np.newaxis]
+        #log_word_proba_given_topic = np.log(word_proba_given_topic)        
+        
     var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
         docs[doc_num], log_dirich_param, log_word_proba_given_topic,
         save_log_likelihoods = True)
 
     plt.plot(log_likelihoods)
     
-    vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
+    #vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
