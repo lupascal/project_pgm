@@ -26,7 +26,7 @@ def test_variational_inference(voc = None, docs = None,
         doc_num = np.random.randint(doc_count)
         
     if dirich_param == None:
-        log_dirich_param = np.zeros(n_topics)
+        log_dirich_param = 0
 
     if word_proba_given_topic == None:
         log_word_proba_given_topic = np.zeros((n_topics, voc_size)) \
