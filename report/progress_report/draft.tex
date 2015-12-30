@@ -71,8 +71,11 @@ Latent Dirichlet allocation (LDA) is a generative probabilistic model of a corpu
 \KwData{corpus $D$}
 \Begin{
 \For{\emph{each document} $d \in D$}{
-Choose $N \sim \textnormal{Poisson}(\xi)$\;Choose $\theta^{(d)} \sim \textnormal{Dir}(\alpha)$\;\For{\emph{each of the $N$ words $w_n^{(d)}$}}{
-Choose a topic $z_n^{(d)} \sim  \textnormal{Multinomial}(\theta^{(d)})$\;Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability conditioned on the topic $z_n$.
+Choose $N \sim \textnormal{Poisson}(\xi)$\;
+Choose $\theta^{(d)} \sim \textnormal{Dir}(\alpha)$\;
+\For{\emph{each of the $N$ words $w_n^{(d)}$}}{
+Choose a topic $z_n^{(d)} \sim  \textnormal{Multinomial}(\theta^{(d)})$\;
+Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability conditioned on the topic $z_n$.
 }
 }
 }
@@ -83,9 +86,9 @@ Choose a topic $z_n^{(d)} \sim  \textnormal{Multinomial}(\theta^{(d)})$\;Choose
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-0.5,-0.3)(8,3.5)
 \rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha$}}}
-\rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
-\rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
+\rput(2,1){\pscirclebox{$\theta^{(d)}$}}
+\rput(4,1){\pscirclebox{$z^{(d)}_n$}}
+\rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{n}^{(d)}$}}
 \rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta$}}}
 \pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
 \pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
@@ -119,7 +122,8 @@ p(d|\alpha, \beta)
 \end{align*}
 
 \subsection{Inference and parameter estimation}
-The basic idea of variational inference is to use Jensen's inequality to obtain an adjustable lower bound on the log likelihood.
+
+The basic idea of variational inference is to use Jensen's inequality to obtain an adjustable lower bound on the log likelihood.
 
 An easy is to introduce, for each document $d$, the following latent variables:
  \begin{itemize}
@@ -141,8 +145,8 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-0.5,-0.3)(8,3.5)
 \rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha$}}}
-\rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
+\rput(2,1){\pscirclebox{$\theta^{(d)}$}}
+\rput(4,1){\pscirclebox{$z^{(d)}_n$}}
 \rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
 \rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta$}}}
 \pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
@@ -162,10 +166,10 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 \begin{center}
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-1,-0.1)(4,4)
-\rput(0,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\gamma^{(d)}_j$}}
-\rput(0,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(2,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\phi^{(d)}_{nj}$}}
-\rput(2,1){\pscirclebox{$z^{(d)}_{nj}$}}
+\rput(0,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\gamma^{(d)}$}}
+\rput(0,1){\pscirclebox{$\theta^{(d)}$}}
+\rput(2,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\phi^{(d)}_n$}}
+\rput(2,1){\pscirclebox{$z^{(d)}_n$}}
 \pspolygon(1.25,0.25)(3.15,0.25)(3.15,3.75)(1.25,3.75)
 \pspolygon(-0.9,0)(3.8,0)(3.8,4)(-0.9,4)
 \psline{->}(0,2.5)(0,1.5)
@@ -181,7 +185,7 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 \end{center}
 \end{figure}
 
-\subsubsection*{EM algorithm}
+\subsubsection{EM algorithm}
 
 \begin{algorithm}
 \caption{EM algorithm}
@@ -207,31 +211,21 @@ Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 }
 \end{algorithm}
 
-The expected log-likelihood, for a document $d$, is:
-\begin{align*}
-L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
-& = \log \Gamma\left( k\alpha \right) - k \log \Gamma(\alpha) + (\alpha - 1)  \sum_{i=1}^k \left( \Psi(\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)} \right) \right) \\
-&+ \sum_{n=1}^{N_d} \sum_{i=1}^k \phi_{ni}^{(d)} \left( \Psi(\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)} \right) \right) \\
-&+ \sum_{n=1}^{N_d} \sum_{i=1}^k \sum_{j=1}^V \phi_{ni}^{(d)} w_{nj}^{(d)} \log \beta_{ij} \\
-& - \log \Gamma \left( \sum_{j=1}^k \gamma_j^{(d)} \right) + \sum_{i=1}^k \log \Gamma(\gamma_i^{(d)}) - \sum_{i=1}^k(\gamma_i^{(d)} - 1) \left( \Psi(\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)} \right)\right) \\
-&- \sum_{n=1}^{N_d} \sum_{i=1}^k \phi_{ni}^{(d)}\log\phi_{ni}^{(d)} 
-\end{align*}
-
 \begin{algorithm}
 \caption{E-step for a document $d$ (Variational Inference Procedure)}
 \KwData{\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
 \KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
 \Begin{
-Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
-Initialize $\gamma_i^{(d)} = \alpha + \frac{N}{k}$ for all $i$ \;
+Initialize $\phi_{ni}^{(d), 0} = \frac{1}{k}$ for all $i$ and $n$\;
+Initialize $\gamma_i^{(d)} = \alpha_i + \frac{N}{k}$ for all $i$ \;
 \While{not converged}{
 \For{$n=1\ldots N$}{
 \For{$i=1\ldots k$}{
-$\phi_{ni}^{(d)} = \beta_iw_n\exp(\Psi(\gamma_i^{(d)}))$
+$\phi_{ni}^{(d), t+1} = \beta_{iw_n}\exp(\Psi(\gamma_i^{(d), t}))$
 }
-normalize $\phi_n^{(d)}$ to sum to $1$.
+normalize $\phi_n^{(d), t+1}$ to sum to $1$.
 }
-$\gamma^{(d)} = \alpha + \sum_{n=1}^N \phi_n^{(d)}$
+$\gamma^{(d), t+1} = \alpha + \sum_{n=1}^N \phi_n^{(d), t+1}$
 }
 }
 \end{algorithm}
@@ -241,27 +235,70 @@ $\gamma^{(d)} = \alpha + \sum_{n=1}^N \phi_n^{(d)}$
 \KwData{$\{$\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$), $d \in D\}$}
 \KwResult{\texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
 \Begin{
-$\beta \propto \sum_{d \in D} (\phi^{(d)})^{\top}w^{(d)}$ (which corresponds to $\beta_{ij} \propto \sum_{d \in D} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$)
+$\beta_{ij} \propto \sum_{d \in D} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$
 
-\While{not converged}{
-$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where $\begin{cases}L'(\alpha) = |D| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in D} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
-L''(\alpha) = |D|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases}$
-}
+Until convergence:
+
+\quad\quad $\alpha \leftarrow \alpha - H(\alpha)^{-1}g(\alpha)$ where $g (\alpha)= \left( \frac{\partial L}{\partial \alpha_i}\right)_i$ and $H(\alpha) = \left( \frac{\partial L}{\partial\alpha_i\partial\alpha_j}\right)_{ij}$
+
+\[ \begin{cases} \frac{\partial L}{\partial \alpha_i} = |D| \left[ \Psi\left( \sum_{j=1}^k \alpha_j\right) - \Psi(\alpha_i)\right] + \sum_{d \in D} \left[\Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
+ \frac{\partial L}{\partial \alpha_i\partial \alpha_j} = \delta_{ij} |D| \Psi'(\alpha_i) - \Psi' \left( \sum_{j=1}^k \alpha_j\right) \end{cases} \]
 }
 \end{algorithm}
 
-\section{Implementation and results}
-\subsection{Implementation issues}
+We note that $H(\alpha) = \text{diag}(h) - 1z1^{\top}$ where:
+\[ h = ( |D| \Psi'(\alpha_i))_i \quad \text{and} \quad z = \left(\Psi' \left( \sum_{p=1}^k \alpha_p\right)\right)_{i, j} \]
 
-\subsection{Results}
+Then $(H^{-1}(\alpha)g(\alpha))_i = \frac{\frac{\partial L}{\partial \alpha_i} -c}{ \frac{\partial^2 L}{\partial \alpha_i^2}}$ where $c = \frac{\sum_{j=1}^k \frac{\frac{\partial L}{\partial \alpha_j}}{ \frac{\partial^2 L}{\partial \alpha_j^2}}}{z^{-1}+\sum_{j=1}^k \left( \frac{\partial^2 L}{\partial \alpha_i^2}\right)^{-1}}$.
+
+\subsubsection{Convergence criterion: expected log-likelihood}
+
+\begin{align*}
+L(\gamma, \phi, \alpha, \beta)
+& = \log \Gamma\left( \sum_{j=1}^k\alpha_j \right) - \sum_{i=1}^k \log \Gamma(\alpha_i) + \sum_{i=1}^k (\alpha_i- 1) \left( \Psi(\gamma_i) - \Psi\left( \sum_{j=1}^k \gamma_j \right) \right) \\
+&+ \sum_{n=1}^N\sum_{i=1}^k \phi_{ni} \left( \Psi(\gamma_i) - \Psi\left( \sum_{j=1}^k \gamma_j \right) \right) \\
+&+ \sum_{n=1}^N \sum_{i=1}^k \sum_{j=1}^V \phi_{ni} w_n^j \log \beta_{ij} \\
+& - \log \Gamma \left( \sum_{j=1}^k \gamma_j \right) + \sum_{i=1}^k \log \Gamma(\gamma_i) - \sum_{i=1}^k(\gamma_i - 1) \left( \Psi(\gamma_i) - \Psi\left( \sum_{j=1}^k \gamma_j \right)\right) \\
+&- \sum_{n=1}^N \sum_{i=1}^k \phi_{ni}\log\phi_{ni} 
+\end{align*}
+
+\section{Implementation issues}
 
 
-\section{Conclusion}
+\subsection{Initialization and computation of $\alpha$}
 
-\begin{thebibliography}{BNJ03}
-\bibitem[BNJ03]{BNJ03} David M. Blei, Andrew Y. Ng and Michael I. Jordan. Latent Dirichlet Allocation. \emph{The Journal of Machine Learning Research}, 3:993--1022, 2003.
-\end{thebibliography}
+\begin{itemize}
+\setlength\itemsep{-0.2em}
+  \item We need to initialize of $\alpha$ and $\beta$ before starting the EM-algorithm. The initialization step still remains a problem.
+  \item The computation of $\alpha$ uses a Newton-Raphson algorithm ``$\alpha \leftarrow \alpha - H(\alpha)^{-1}g(\alpha)$". However, the convergence of $\alpha$ depends on the initialization of $\alpha$.
+\end{itemize}
+
+\subsection{Initialization of $\beta$}
+
+The computation of $\beta$ was simplified. It is essentially based on the sum of $(\phi^{(d)})^{\top}w^{(d)}$ for $d \in D$.
+
+\section{Results}
+
+
+
+\section{Bibliography}
+
 
 
 
 \end{document}
+
+build voc
+
+
+
+
+
+
+
+given a corpus of documents $D = \{\mathbf{w}_1,\mathbf{w}_2, \ldots, \mathbf{w}_M\}$
+
+\[ \ell(\alpha, \beta) = \sum_{d = 1}^M \log p(\mathbf{w}_d| \alpha, \beta) \]
+
+where:
+\[ p(\mathbf{w}| \alpha, \beta) = \frac{\Gamma\left( \sum_i \alpha_i\right)}{\prod_i \Gamma(\alpha_i)} \int \left( \prod_{i=1}^k \theta_i^{\alpha_i - 1} \right) \left( \prod_{n=1}^N \sum_{i=1}^k \prod_{j=1}^V (\theta_i \beta_{ij})^{w_n^j} \right) \text{d}\theta \]
