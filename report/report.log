@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.10.3)  30 DEC 2015 00:57
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015) (preloaded format=xelatex 2015.10.3)  30 DEC 2015 11:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -748,14 +748,20 @@ Underfull \vbox (badness 1910) has occurred while \output is active []
 
  [3]
 [4]
-File: img/figure_1.png Graphic file (type QTm)
- <use  "img/figure_1.png" > [5]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 357.
+File: img/k=10/log_likelihood_corpus_k=10.png Graphic file (type QTm)
+ <use  "img/k=10/log_likelihood_corpus_k=10.png" >
+Underfull \vbox (badness 1062) has occurred while \output is active []
+
+ [5]
+File: img/k=10/log_likelihood_document_k=10.png Graphic file (type QTm)
+
+<use  "img/k=10/log_likelihood_document_k=10.png" >
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 368.
  [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 357.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 368.
  (./report.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 357.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 357.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 368.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 368.
 
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
@@ -763,13 +769,13 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 357.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 368.
  ) 
 Here is how much of TeX's memory you used:
- 20336 strings out of 493706
- 324306 string characters out of 6145769
- 452936 words of memory out of 5000000
- 23390 multiletter control sequences out of 15000+600000
+ 20338 strings out of 493706
+ 324425 string characters out of 6145769
+ 452937 words of memory out of 5000000
+ 23391 multiletter control sequences out of 15000+600000
  16546 words of font info for 64 fonts, out of 8000000 for 9000
  1328 hyphenation exceptions out of 8191
  53i,24n,92p,623b,699s stack positions out of 5000i,500n,10000p,200000b,80000s

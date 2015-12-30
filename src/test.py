@@ -13,7 +13,7 @@ path_to_reuters = path.expanduser(
 #  '~/Documents/MVA/proba_graph_models/project/reuters_21578')
 
 def test_variational_inference(voc = None, docs = None,
-                               max_files = None, doc_num = None, n_topics = 30,
+                               max_files = None, doc_num = None, n_topics = 20,
                                dirich_param = .5,
                                log_word_proba_given_topic = None,
                                **kwargs):
@@ -37,19 +37,32 @@ def test_variational_inference(voc = None, docs = None,
         word_proba_given_topic /= np.sum(word_proba_given_topic,
                                          axis = 1).reshape((-1,1))
         log_word_proba_given_topic = np.log(word_proba_given_topic)
-
+        
+    # test for a document d
     var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
         docs[doc_num], dirich_param, log_word_proba_given_topic, **kwargs)
-
-    #plt.plot(log_likelihoods)
+    
+    plt.figure(1)
+    plt.plot(log_likelihoods)   
+    plt.xlabel('iterations')
+    plt.ylabel('expected log-likelihood')
+    plt.title('expected log-likelihood for a document d, k = ' + str(n_topics))
 
     (dirich_param, word_logproba_given_topic, corpus_log_likelihood) = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
     
+    # test for a corpus
+    plt.figure(2)
     plt.plot(corpus_log_likelihood)    
+    plt.xlabel('iterations')
+    plt.ylabel('expected log-likelihood')
+    plt.title('expected log-likelihood for a corpus, k = ' + str(n_topics))
+    plt.show()
     
     top_words = topic_top_words(word_logproba_given_topic, voc, num_words = 10)    
     
     return (dirich_param, word_logproba_given_topic, top_words)
+
+
 
 def topic_top_words(word_logproba_given_topic, voc, num_words = 10):
 

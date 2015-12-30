@@ -31,7 +31,7 @@
 \usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
 
 \title{Latent Dirichlet Allocation} % Poster title
-\author{J\'er\^ome DOCK\`ES, Pascal LU} % Author(s)
+\author{J\'er\^ome DOCK\`ES {\small{(\texttt{jerome\{at\}dockes.org})}}, Pascal LU  {\small{(\texttt{pascal.lu\{at\}centraliens.net})}} } % Author(s)
 \institute{\'Ecole Normale Sup\'erieure de Cachan $-$ \today} % Institution
 
 \begin{document}
@@ -326,11 +326,11 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{
 
 \begin{block}{Results}
 
-We have tested our algorithm on real data from the Reuters21578 database.
+Tested on real data from the Reuters21578 database.
 
 \begin{table}
 \vspace{2ex}
-\begin{small}
+\begin{footnotesize}
 \begin{tabular}{c c c c}
 \toprule
 \textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4}\\
@@ -346,18 +346,22 @@ peripheral & outweighed & Barbara & 899  \\
 color & accomplishments & definitive & science  \\
 \bottomrule
 \end{tabular}
-\end{small}
-\caption{Results for 4 topics}
+\end{footnotesize}
+\caption{Results for 4 topics $(k=10)$}
 \end{table}
 
 \begin{figure}[ht!]
-\includegraphics[width=0.5\linewidth]{../img/figure_1.png}
-\caption{Expected log-likelihood for a corpus, $k=30$}
+\begin{center}
+\includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_corpus_k=10.png}
+\caption{Expected log-likelihood for the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\end{center}
 \end{figure}
 
 \begin{figure}[ht!]
-\includegraphics[width=0.5\linewidth]{../img/figure_1.png}
-\caption{Expected log-likelihood for a document, $k=30$}
+\begin{center}
+\includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_document_k=10.png}
+\caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\end{center}
 \end{figure}
 
 \end{block}
@@ -367,7 +371,9 @@ color & accomplishments & definitive & science  \\
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Conclusion}
+LDA = a way to apply graphical models to information retrieval = group words in the same categories. Key idea = variational inference. 
 
+Other interesting applications: biology (DNA sequence), content-based image retrieval$\ldots$
 \end{block}
 
 %----------------------------------------------------------------------------------------

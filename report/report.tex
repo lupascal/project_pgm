@@ -28,7 +28,7 @@
 \title{Latent Dirichlet allocation}
 \author{
 J\'er\^ome DOCK\`ES (\texttt{jerome\{at\}dockes.org}) \\
-\textbf{Pascal LU (\texttt{pascal.lu\{at\}student.ecp.fr})} \\
+\textbf{Pascal LU (\texttt{pascal.lu\{at\}centraliens.net})} \\
 \'Ecole Normale Sup\'erieure de Cachan \\
 }
 
@@ -302,8 +302,9 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \en
 
 \textbf{Initialization}:
 \begin{itemize}
-  \item $\alpha$ is chosen randomly, but $\alpha \neq 0$.
-  \item $\beta$ is chosen randomly.
+\setlength\itemsep{-0.2em}
+  \item $\alpha$ is chosen randomly, but $\alpha > 0$. We have chosen $\alpha = 0.5$.
+  \item $\beta$ is chosen randomly, with $\sum_{j} \beta_{ij} = 1$ $\forall i \in \{1, \ldots, V\}$.
 \end{itemize}
 
 \subsection{Results}
@@ -327,7 +328,7 @@ peripheral & outweighed & Barbara & 899  \\
 color & accomplishments & definitive & science  \\
 \hline
 \end{tabular}
-\caption{Results for 4 topics $(k=10)$}
+\caption{Results for 4 topics on the corpus \texttt{reut2-000.sgm} $(k=10)$}
 \end{center}
 \end{table}
 
@@ -337,17 +338,27 @@ The following curve represents the evolution of the expected log-likelihood comp
 
 \begin{figure}[ht!]
 \begin{center}
-\includegraphics[width=0.5\linewidth]{img/figure_1.png}
-\caption{Expected log-likelihood for a corpus ($k=30$)}
+\includegraphics[width=0.5\linewidth]{img/k=10/log_likelihood_corpus_k=10.png}
+\caption{Expected log-likelihood for the corpus \texttt{reut2-000.sgm} ($k=10$)}
 \end{center}
 \end{figure}
 
+After 20 iterations, there is convergence of the expected log-likelihood.
+
 \subsubsection*{Convergence of the expected log-likelihood for a document (variational inference)}
 
-
-
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.5\linewidth]{img/k=10/log_likelihood_document_k=10.png}
+\caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\end{center}
+\end{figure}
 
 \section{Conclusion}
+
+LDA is an interesting way to apply graphical models to Natural Language Processing, and in our case, on information retrieval. Given a corpus and a set of vocabulary, LDA is able to group words in the same categories. The key idea in LDA is variational inference. 
+
+There are other interesting applications of LDA, such that biology (DNA sequence), content-based image retrieval$\ldots$
 
 \begin{thebibliography}{BNJ03}
 \bibitem[BNJ03]{BNJ03} David M. Blei, Andrew Y. Ng and Michael I. Jordan. Latent Dirichlet Allocation. \emph{The Journal of Machine Learning Research}, 3:993--1022, 2003.
