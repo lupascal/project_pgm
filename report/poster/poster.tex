@@ -124,7 +124,7 @@ For {\emph{each document} $d \in \mathcal{D}$}{
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Generative model}
-\textbf{Goal}: determine
+The \textbf{goal} is to determine:
 
 \begin{itemize}
 \item $\alpha$ = estimate of the parameter of the Dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. Size of $\alpha = k$.
@@ -232,7 +232,7 @@ For a document $d \in \mathcal{D}$:
   $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
    \end{itemize}
 
-$\Rightarrow$ Estimate $\gamma^{(d)}, \phi_{ni}^{(d)}$ instead of $\theta^{(d)}$ and $z_n^{(d)}$.
+$\Rightarrow$ Estimate $\gamma^{(d)}, \phi_{n}^{(d)}$ instead of $\theta^{(d)}$ and $z_n^{(d)}$.
 
 \begin{figure}
 \begin{center}
@@ -326,26 +326,40 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{
 
 \begin{block}{Results}
 
-\begin{figure}[ht!]
-\includegraphics[width=0.8\linewidth]{../img/figure_1.png}
-\caption{Expected log-likelihood for a corpus, $k=30$}
-\end{figure}
-
-Nunc tempus venenatis facilisis. Curabitur suscipit consequat eros non porttitor. Sed a massa dolor, id ornare enim:
+We have tested our algorithm on real data from the Reuters21578 database.
 
 \begin{table}
 \vspace{2ex}
-\begin{tabular}{l l l}
+\begin{small}
+\begin{tabular}{c c c c}
 \toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
+\textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4}\\
 \midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
+devices & prolonged & zestril & features \\
+disk & council & annesthetic &  shipping  \\
+megabyte & forum & hypertension & 798  \\
+expandable & dissident & oth & 998  \\
+megabytes & flying & statil & sells  \\
+equipped &  sparks & diabetic & AppleWorld  \\
+monochrome &talks & complications & Conference  \\
+peripheral & outweighed & Barbara & 899  \\
+color & accomplishments & definitive & science  \\
 \bottomrule
 \end{tabular}
-\caption{Table caption}
+\end{small}
+\caption{Results for 4 topics}
 \end{table}
+
+\begin{figure}[ht!]
+\includegraphics[width=0.5\linewidth]{../img/figure_1.png}
+\caption{Expected log-likelihood for a corpus, $k=30$}
+\end{figure}
+
+\begin{figure}[ht!]
+\includegraphics[width=0.5\linewidth]{../img/figure_1.png}
+\caption{Expected log-likelihood for a document, $k=30$}
+\end{figure}
+
 \end{block}
 
 %----------------------------------------------------------------------------------------
@@ -353,8 +367,6 @@ Treatment 3 & 0.0009271 & 0.296 \\
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Conclusion}
-
-Nunc tempus venenatis facilisis. \textbf{Curabitur suscipit} consequat eros non porttitor. Sed a massa dolor, id ornare enim. Fusce quis massa dictum tortor \textbf{tincidunt mattis}. Donec quam est, lobortis quis pretium at, laoreet scelerisque lacus. Nam quis odio enim, in molestie libero. Vivamus cursus mi at \textit{nulla elementum sollicitudin}.
 
 \end{block}
 
@@ -377,12 +389,12 @@ Nunc tempus venenatis facilisis. \textbf{Curabitur suscipit} consequat eros non 
 \setbeamercolor{block alerted title}{fg=black,bg=norange} % Change the alert block title colors
 \setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
 
-\begin{alertblock}{Contact Information}
-\begin{itemize}
-  \item \texttt{jerome\{at\}dockes.org}
-  \item \texttt{pascal.lu\{at\}centraliens.net}
-\end{itemize}
-\end{alertblock}
+%\begin{alertblock}{Contact Information}
+%\begin{itemize}
+%  \item \texttt{jerome\{at\}dockes.org}
+%  \item \texttt{pascal.lu\{at\}centraliens.net}
+%\end{itemize}
+%\end{alertblock}
 
 %----------------------------------------------------------------------------------------
 
