@@ -176,7 +176,7 @@ Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$.
 
 Initialize $\gamma_i^{(d)} = \alpha + \frac{1}{k}\sum_{n=1}^{N_d} w_n^{(d)}$ for all $i$.
 
-While {\emph{the expected log-likelihood for the document $d$ has not converged}}{
+While {\emph{the expected log-likelihood $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$ for the document $d$ has not converged}}{
 
 \quad For {$n=1\ldots N_d$}{
 
@@ -190,6 +190,8 @@ While {\emph{the expected log-likelihood for the document $d$ has not converged}
 }
 
 \quad $\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
+
+\quad Update $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$
 }
 
 \end{block}
@@ -279,15 +281,17 @@ Initialize $\alpha$, $\beta$ and $\Sigma_{\gamma}$ = 0.
 
 \medskip
 
-While {\emph{the expected log-likelihood has not converged}: }{
+While {\emph{the expected log-likelihood $L(\alpha, \beta)$ has not converged}: }{
 
 \quad For {\emph{each} $d \in \mathcal{D}$}{
 
-\quad\quad ($\gamma^{(d)}$, $\phi^{(d)}$) = \textbf{E-step}($w^{(d)}$, $\alpha$, $\beta$)
+\quad\quad $(\gamma^{(d)}, \phi^{(d)})$ = \textbf{E-step}$(w^{(d)}, \alpha, \beta)$
 
-\quad\quad Update $\beta \leftarrow \beta +  (\phi^{(d)})^{\top}w^{(d)}$
+\quad\quad Update $\beta \leftarrow \beta + (\phi^{(d)})^{\top}w^{(d)}$
 
-\quad\quad Update $\Sigma_{\gamma} \leftarrow \Sigma_{\gamma} + \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) $
+\quad\quad Update $\Sigma_{\gamma} \leftarrow \Sigma_{\gamma} + \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right)$
+
+\quad\quad Update $L(\alpha, \beta) \leftarrow L(\alpha, \beta) +L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$
 }
 
 \quad Normalize $\beta$ 
@@ -295,7 +299,7 @@ While {\emph{the expected log-likelihood has not converged}: }{
 \quad While {\emph{$\alpha$ has not converged}}{
 
 \quad \quad $\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \Sigma_{\gamma} \\
-L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
+L''(\alpha) = |\mathcal{D}|k [k\Psi'(k\alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
 
 }
 }
@@ -303,8 +307,9 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{
 
 \begin{block}{Implementation issues}
 \begin{itemize}
+  \item Preprocessing of the documents.
   \item Initialization of $\alpha$ et $\beta$.
-  \item Optimization and convergence of the parameters and the expected log-likelihood.
+  \item Optimization of the parameters.
 \end{itemize}
 \end{block}
 
@@ -326,7 +331,7 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(\alpha) - \Psi' \left( \alpha\right)] \end{
 
 \begin{block}{Results}
 
-Tested on real data from the Reuters21578 database.
+Tested on real data from the Reuters21578 database (\texttt{reut2-000.sgm}).
 
 \begin{table}
 \vspace{2ex}
@@ -353,14 +358,14 @@ color & accomplishments & definitive & science  \\
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_corpus_k=10.png}
-\caption{Expected log-likelihood for the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\caption{Expected log-likelihood for the corpus ($k=10$)}
 \end{center}
 \end{figure}
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_document_k=10.png}
-\caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\caption{Expected log-likelihood for a document ($k=10$)}
 \end{center}
 \end{figure}
 
