@@ -1,8 +1,6 @@
-## Probabilistic graphical models
+### Latent Dirichlet Allocation
 
-**Latent Dirichlet Allocation**
-
-**Topic**: Applications of Graphical models to text
+**Probabilistic graphical models**
 
 **Reference**: 
 
