@@ -7,7 +7,7 @@ import variational_inference as vi
 reload(vi)
 
 path_to_reuters = path.expanduser(
-      '/home/student/probabilistic_graphical_models/project_pgm/src/reuters21578/')
+      '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/')
 
 #path_to_reuters = path.expanduser(
 #  '~/Documents/MVA/proba_graph_models/project/reuters_21578')
@@ -37,7 +37,8 @@ def test_variational_inference(voc = None, docs = None,
         word_proba_given_topic /= np.sum(word_proba_given_topic,
                                          axis = 1).reshape((-1,1))
         log_word_proba_given_topic = np.log(word_proba_given_topic)
-        
+    
+    
     # test for a document d
     var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
         docs[doc_num], dirich_param, log_word_proba_given_topic, **kwargs)
@@ -48,9 +49,9 @@ def test_variational_inference(voc = None, docs = None,
     plt.ylabel('expected log-likelihood')
     plt.title('expected log-likelihood for a document d, k = ' + str(n_topics))
 
-    (dirich_param, word_logproba_given_topic, corpus_log_likelihood) = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
     
     # test for a corpus
+    (dirich_param, word_logproba_given_topic, corpus_log_likelihood) = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
     plt.figure(2)
     plt.plot(corpus_log_likelihood)    
     plt.xlabel('iterations')
@@ -60,12 +61,13 @@ def test_variational_inference(voc = None, docs = None,
     
     top_words = topic_top_words(word_logproba_given_topic, voc, num_words = 10)    
     
-    return (dirich_param, word_logproba_given_topic, top_words)
+    print top_words    
+    
+    #return (dirich_param, word_logproba_given_topic, top_words)
 
 
-
+# display the ten first words for each topic
 def topic_top_words(word_logproba_given_topic, voc, num_words = 10):
-
     order = np.argsort(word_logproba_given_topic, axis = 1)[:,:num_words]
     reversed = dp.reverse_dict(voc)
     top_words = [[reversed[index] for index in topic] for topic in order]
