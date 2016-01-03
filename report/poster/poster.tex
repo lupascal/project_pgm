@@ -264,9 +264,9 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(k\alpha) - \Psi' \left( \alpha\right)] \end
 \begin{block}{Implementation issues}
 \begin{itemize}
   \item Document and vocabulary preprocessing : remove redundant words.
-  \item Initialization of $\alpha$ et $\beta$: there were initialized randomly, with $\alpha > 0$.
-  \item Computation of $\alpha$ much simpler under the exchangeable Dirichlet distribution assumption.
-  \item Parameters: choice of $k$, number of iterations so that the E-step and M-step converge.
+  \item It is a non-convex optimization problem: estimates for $\alpha, \beta$ depend on their initialization.
+  \item Under the exchangeable Dirichlet distribution assumption, the computation of $\alpha$ is much simpler. We initialized $\alpha > 0$ randomly. 
+  \item $\beta$ was initialized randomly.
 \end{itemize}
 \end{block}
 \end{column}
