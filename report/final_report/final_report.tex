@@ -27,8 +27,8 @@
 
 \title{Latent Dirichlet allocation}
 \author{
-J\'er\^ome DOCK\`ES (\texttt{jerome\{at\}dockes.org}) \\
-\textbf{Pascal LU (\texttt{pascal.lu\{at\}centraliens.net})} \\
+J\'er\^ome DOCK\`ES (\texttt{jerome@dockes.org}) \\
+\textbf{Pascal LU (\texttt{pascal.lu@centraliens.net})} \\
 \'Ecole Normale Sup\'erieure de Cachan \\
 }
 
@@ -36,7 +36,7 @@ J\'er\^ome DOCK\`ES (\texttt{jerome\{at\}dockes.org}) \\
 
 \maketitle
 
-We consider the problem of modeling text corpora. The goal is to find short descriptions of the members of a collection that enable efficient processing of large collections while preserving the essential statistical relationships that are useful for basic tasks such as classification, novelty detection, summarization, and similarity and relevance judgments.
+We consider the problem of modeling text corpora. The goal is to find short descriptions of the members of a collection that enable efficient processing of large collections while preserving the essential statistical relationships. Our work is mainly based on \cite{BNJ03}.
 
 \section{Latent Dirichlet allocation}
 \subsection{Presentation of the model}
@@ -104,10 +104,11 @@ Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability c
 
 The following parameters are introduced:
 \begin{itemize}
-  \item $\alpha$ (\verb"dirich_param") is an estimate of the parameter of the dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. The size of $\alpha$ is the number of topics, $k$. \textbf{We suppose that $\alpha = \alpha \mathbf{1}_{k}$\footnote{This assumption is suggested by the authors of \cite{BNJ03}.} .}
+  \item $\alpha$ (\verb"dirich_param") is an estimate of the parameter of the dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. The size of $\alpha$ is the number of topics, $k$. \textbf{We suppose that $\alpha = \alpha \mathbf{1}_{k}$ (exchangeable Dirichlet distribution) \footnote{This assumption is suggested by the authors of \cite{BNJ03}.} .}
   
   \item $\beta$ (\verb"word_prob_given_topic") is a matrix of size (number of topics $\times$ vocabulary size $= k \times V$) which gives the (estimated) probability that a given topic will generate a certain word:
 \[ \beta_{ij}= p(w^j = 1 | z^i = 1) \]
+where $w^j$ the $j^{\text{th}}$ word of the vocabulary and $z^i$ the $i^{\text{th}}$ topic.
  \end{itemize}
 
 LDA is based on the computation of the parameters $(\alpha, \beta)$, for instance by maximizing the log-likelihood. For a document $d$, the probability $p(d|\alpha, \beta)$ is given by:
@@ -121,7 +122,12 @@ p(d|\alpha, \beta)
 
 \subsection{Inference and parameter estimation}
 
-The basic idea of variational inference is to use Jensen's inequality to obtain an adjustable lower bound on the log likelihood.
+In the inference part, we need to compute the posterior distribution of the hidden variables given a document $d$:
+\[ p(\theta^{(d)}, z^{(d)} | d, \alpha, \beta) = \frac{p(\theta^{(d)}, z^{(d)}, d | \alpha, \beta)}{p(d | \alpha, \beta)} \]
+
+Unfortunately, the distribution $p(d|\alpha, \beta)$ is not computable in general.
+
+The idea is to use Jensen's inequality to obtain an adjustable lower bound on the log likelihood and to introduce new latent variables.
 
 For each document $d \in \mathcal{D}$, the following latent variables are introduced:
  \begin{itemize}
@@ -132,35 +138,9 @@ For each document $d \in \mathcal{D}$, the following latent variables are introd
   $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
    \end{itemize}
 
-and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The conditional probability is:
-
-\[ q(\theta^{(d)}, z^{(d)}|\gamma^{(d)}, \delta^{(d)}) = q(\theta^{(d)}|\gamma^{(d)}) \prod_{n=1}^{N_d} q(z_n^{(d)}|\phi_n^{(d)})\]
+The conditional probability is $q(\theta^{(d)}, z^{(d)}|\gamma^{(d)}, \delta^{(d)}) = q(\theta^{(d)}|\gamma^{(d)}) \prod_{n=1}^{N_d} q(z_n^{(d)}|\phi_n^{(d)})$
 
 \begin{figure}[ht!]
-\begin{center}
-\begin{subfigure}{.75\textwidth}
-\begin{center}
-\psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
-\begin{pspicture*}(-0.5,-0.3)(8,3.5)
-\rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
-\rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
-\rput(6,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=yellow]{$w_{nj}^{(d)}$}}
-\rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
-\pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
-\pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
-\psline{->}(0.27,1)(1.58,1)
-\psline{->}(2.43,1)(3.58,1)
-\psline{->}(4.44,1)(5.5,1)
-\psline{->}(6,2.7)(6,1.5)
-\rput(6.75,0.5){$N_d$}
-\rput(7.5,0.25){$M$}
-\end{pspicture*}
-\caption{Generative model}
-\label{generative}
-\end{center}
-\end{subfigure}
-\begin{subfigure}{.75\textwidth}
 \begin{center}
 \psset{xunit=1.0cm,yunit=1.0cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
 \begin{pspicture*}(-1,-0.1)(4,5)
@@ -175,13 +155,45 @@ and to try to estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$. The condi
 \rput(2.75,0.5){$N_d$}
 \rput(3.5,0.25){$M$}
 \end{pspicture*}
-\caption{Variational model}
 \label{variational}
-\end{center}
-\end{subfigure}
-\caption{Graphical model}
+\caption{Variational model}
 \end{center}
 \end{figure}
+
+We will estimate them instead of $\theta^{(d)}$ and $z_n^{(d)}$:
+
+\[ (\gamma^{(d)}, \phi^{(d)}) = \mathop{\textnormal{argmin}}_{(\gamma, \phi)} \textnormal{D} \left( q(\theta^{(d)}, z^{(d)}|\gamma, \phi) \left\| p(\theta^{(d)}, z^{(d)} | d, \alpha, \beta) \right. \right) \]
+
+where $\textnormal{D}(\cdot \| \cdot)$ is the Kullback-Leibler (KL). 
+
+\begin{algorithm}
+\caption{Variational Inference Procedure for a document $d$}
+\KwData{\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
+\KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
+\Begin{
+Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
+Initialize $\gamma_i^{(d)} = \alpha + \frac{1}{k}\sum_{n=1}^{N_d} w_n^{(d)}$ for all $i$ \;
+\While{\emph{the expected log-likelihood for the document $d$ has not converged}}{
+\For{$n=1\ldots N_d$}{
+\For{$i=1\ldots k$}{
+$\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
+}
+normalize $\phi_n^{(d)}$ to sum to $1$.
+}
+$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
+}
+}
+\end{algorithm}
+
+The article \cite{BNJ03} tells us that a possible solution is:
+
+\begin{align*}
+\phi_{ni}^{(d)} & \propto \beta_{iw_n^{(d)}}\exp( \mathbb{E}_q[ \log(\theta_i) |\gamma] ) \\
+\gamma^{(d)} & = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}
+\end{align*}
+
+and that $\mathbb{E}_q[ \log(\theta_i) |\gamma] = \Psi(\gamma_i^{(d)}) - \Psi\left(\sum_{j=1}^k\gamma_j^{(d)}\right)$ where $\Psi$ is the derivative of the $\log \Gamma$ function.
+
 
 \subsubsection*{EM algorithm}
 
@@ -201,7 +213,7 @@ Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 
 \While{\emph{the expected log-likelihood has not converged}}{
 \For{\emph{each} $d \in \mathcal{D}$}{
-\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{E-step} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)
+\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{variational-inference} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)
 }
 
 \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) = Apply \textbf{M-step} given $\{$\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$), $d \in \mathcal{D}\}$.
@@ -219,24 +231,6 @@ L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)
 &- \sum_{n=1}^{N_d} \sum_{i=1}^k \phi_{ni}^{(d)}\log\phi_{ni}^{(d)} 
 \end{align*}
 
-\begin{algorithm}
-\caption{E-step for a document $d$ (Variational Inference Procedure)}
-\KwData{\texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
-\KwResult{\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$)}
-\Begin{
-Initialize $\phi_{ni}^{(d)} = \frac{1}{k}$ for all $i$ and $n$\;
-Initialize $\gamma_i^{(d)} = \alpha + \frac{1}{k}\sum_{n=1}^{N_d} w_n^{(d)}$ for all $i$ \;
-\While{\emph{the expected log-likelihood for the document $d$ has not converged}}{
-\For{$n=1\ldots N_d$}{
-\For{$i=1\ldots k$}{
-$\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
-}
-normalize $\phi_n^{(d)}$ to sum to $1$.
-}
-$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
-}
-}
-\end{algorithm}
 
 \begin{algorithm}
 \caption{M-step}
@@ -246,19 +240,20 @@ $\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
 $\beta \propto \sum_{d \in \mathcal{D}} (\phi^{(d)})^{\top}w^{(d)}$ (which corresponds to $\beta_{ij} \propto \sum_{d \in \mathcal{D}} \sum_{n=1}^{N_d} \phi_{ni}^{(d)} w_{nj}^{(d)}$)
 
 \While{\emph{$\alpha$ has not converged}}{
-$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where \[ \begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right] \\
-L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \end{cases} \]
+$\frac{\partial L}{\partial\alpha}(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \sum_{d \in \mathcal{D}} \left[ \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) \right]$\;
+$\frac{\partial^2 L}{\partial\alpha^2}(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)]$ \;
+$\alpha \leftarrow \alpha - \frac{\frac{\partial L}{\partial\alpha}(\alpha)}{\frac{\partial^2 L}{\partial\alpha^2}(\alpha)}$ 
 }
 }
 \end{algorithm}
 
 \section{Implementation and results}
-\subsection{Implementation issues}
+\subsection{Implementation}
 
 The following algorithm was implemented :
 
 \begin{algorithm}
-\caption{EM algorithm implemented}
+\caption{Latent Dirichlet Allocation}
 \KwData{Corpus $\mathcal{D}$ of documents, number of topics $k$}
 \KwResult{\texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)}
 \Begin{
@@ -267,90 +262,97 @@ Compute \texttt{word$\_$incidences} ($w^{(d)}$).
 }
 
 Initialize \texttt{dirich$\_$param} ($\alpha$)\;
-Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$) \;
-Initialize \texttt{sum$\_$psi$\_$var$\_$dirich} ($\Sigma_{\gamma}$) = 0 \;
+Initialize \texttt{old$\_$word$\_$prob$\_$given$\_$topic} ($\beta$) \;
 \bigskip
 
 \While{\emph{the expected log-likelihood $L(\mathcal{D}, \alpha, \beta)$ has not converged}}{
+Initialize \texttt{sum$\_$psi$\_$var$\_$dirich} ($\Sigma_{\gamma}$) = 0 \;
 Initialize expected log-likelihood $L(\mathcal{D}, \alpha, \beta) = 0$ \;
+Initialize \texttt{word$\_$prob$\_$given$\_$topic} ($\beta_{\text{new}}$) = 0 \;
 \For{\emph{each} $d \in \mathcal{D}$}{
-\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{E-step} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{word$\_$prob$\_$given$\_$topic} ($\beta$)
+\texttt{var$\_$dirich} ($\gamma^{(d)}$), \texttt{var$\_$multinom} ($\phi^{(d)}$) = apply \textbf{variational-inference} to each document $d$ given \texttt{word$\_$incidences} ($w^{(d)}$), \texttt{dirich$\_$param} ($\alpha$), \texttt{old$\_$word$\_$prob$\_$given$\_$topic} ($\beta$)
 
-Update $\beta \leftarrow \beta +  (\phi^{(d)})^{\top}w^{(d)}$ \;
+Update $\beta_{\text{new}} \leftarrow \beta_{\text{new}} +  (\phi^{(d)})^{\top}w^{(d)}$ \;
 Update $\Sigma_{\gamma} \leftarrow \Sigma_{\gamma} + \sum_{i=1}^k \Psi (\gamma_i^{(d)}) - \Psi\left( \sum_{j=1}^k \gamma_j^{(d)}\right) $ \;
 Update $L(\mathcal{D}, \alpha, \beta) \leftarrow L(\mathcal{D}, \alpha, \beta) + L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$\;
 }
 
-Normalize $\beta$ \;
+Normalize $\beta_{\text{new}}$ and set $\beta = \beta_{\text{new}}$\;
 
 \While{\emph{$\alpha$ has not converged}}{
-$\alpha \leftarrow \alpha - \frac{L'(\alpha)}{L''(\alpha)}$ where $\begin{cases}L'(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \Sigma_{\gamma} \\
-L''(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)] \end{cases}$
+$\frac{\partial L}{\partial\alpha}(\alpha) = |\mathcal{D}| k \left[ \Psi\left( k \alpha \right) - \Psi(\alpha)\right] + \Sigma_{\gamma}$\;
+$\frac{\partial^2 L}{\partial\alpha^2}(\alpha) = |\mathcal{D}|k [k\Psi'(k \alpha) - \Psi' \left( \alpha\right)]$ \;
+$\alpha \leftarrow \alpha - \frac{\frac{\partial L}{\partial\alpha}(\alpha)}{\frac{\partial^2 L}{\partial\alpha^2}(\alpha)}$ 
 }
 }
 }
 \end{algorithm}
 
-\textbf{Computation of $\gamma^{(d)}$}: With the original formula, we have: $\sum \gamma^{(d)} = N_d\times \alpha + \textnormal{number of words in the document } d$.
+\subsection{Implementation tricks}
 
 %Another formula for $\gamma^{(d)}$:
 %\[ \gamma^{(d)} \leftarrow \gamma^{(d)} + \left( \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d), \text{old}} - w_n^{(d)} \phi_n^{(d), \text{new}} \right) \]
+
+\textbf{Preprocessing}: There is a document and vocabulary preprocessing before launching the LDA. The goal is to remove redundant words.
 
 \textbf{Log-likelihood}: $\Gamma(x)$ becomes exponentially big when $x \rightarrow \infty$. We will prefer working with $\ln \Gamma(x)$ (\texttt{gammaln} in scipy) instead of $\Gamma(x)$ (or \texttt{numpy.log(gamma)}).
 
 \textbf{Initialization}:
 \begin{itemize}
 \setlength\itemsep{-0.2em}
-  \item $\alpha$ is chosen randomly, but $\alpha > 0$. We have chosen $\alpha = 0.5$.
+  \item $\alpha> 0$ is chosen randomly. %We have chosen $\alpha = 0.5$.
   \item $\beta$ is chosen randomly, with $\sum_{j} \beta_{ij} = 1$ $\forall i \in \{1, \ldots, V\}$.
 \end{itemize}
 
-\subsection{Results}
+\textbf{Exchangeable Dirichlet distribution assumption}: Under this assumption, the computation of the derivates of the log-likelihood wrt $\alpha$ becomes much simpler.
 
-The database we used may be found at the address \url{http://www.daviddlewis.com/resources/testcollections/reuters21578/}.
+\subsection{Results on real data}
+
+The database we used may be found at the address \url{http://www.daviddlewis.com/resources/testcollections/reuters21578/}. We mainly worked with the corpus \texttt{reut2-000.sgm}, which contains approximatively 2000 documents. Table \ref{voc-result} shows the first words for five selected topics.
 
 \begin{table}[ht!]
 \begin{center}
-\begin{tabular}{c c c c}
+\begin{tabular}{ccccc}
 \hline
-\textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4}\\
+\textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4} & \textbf{Topic 5}\\
 \hline
-devices & prolonged & zestril & features \\
-disk & council & annesthetic &  shipping  \\
-megabyte & forum & hypertension & 798  \\
-expandable & dissident & oth & 998  \\
-megabytes & flying & statil & sells  \\
-equipped &  sparks & diabetic & AppleWorld  \\
-monochrome &talks & complications & Conference  \\
-peripheral & outweighed & Barbara & 899  \\
-color & accomplishments & definitive & science  \\
+devices & prolonged & zestril & seasons & withdrawn \\
+disk & council & annesthetic &  hotels & expiration  \\
+megabyte & forum & hypertension & VMS & clearances \\
+expandable & dissident & oth & Biltmore  & expire \\
+megabytes & flying & statil & Marriott & Willemijn \\
+equipped &  sparks & diabetic & rename & BV \\
+monochrome &talks & complications & hotel & Rotterdam  \\
+peripheral & outweighed & Barbara & 228 & licensed \\
+color & accomplishments & definitive & DH  & NCR \\
 \hline
 \end{tabular}
-\caption{Results for 4 topics on the corpus \texttt{reut2-000.sgm} $(k=10)$}
+\caption{Results for 5 topics on the corpus \texttt{reut2-000.sgm} $(k=10)$}
+\label{voc-result}
 \end{center}
 \end{table}
 
-\subsubsection*{Convergence of the expected log-likelihood on the corpus}
-
-The following curve represents the evolution of the expected log-likelihood computed on the whole corpus:
+Figure \ref{log-likelihood-corpus} represents the evolution of the expected log-likelihood computed on the whole corpus, whereas figure \ref{log-likelihood-doc} represents the evolution of the expected log-likelihood computed one document. Different tries shows that we need at least 20 iterations so that the expected log-likelihood of the corpus converges.
 
 \begin{figure}[ht!]
 \begin{center}
-\includegraphics[width=0.5\linewidth]{img/k=10/log_likelihood_corpus_k=10.png}
-\caption{Expected log-likelihood for the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\includegraphics[width=0.5\linewidth]{../img/k=20/log_likelihood_corpus_k=20.png}
+\caption{Expected log-likelihood for the corpus \texttt{reut2-000.sgm} ($k=20$)}
+\label{log-likelihood-corpus}
 \end{center}
 \end{figure}
 
-After 20 iterations, there is convergence of the expected log-likelihood.
-
-\subsubsection*{Convergence of the expected log-likelihood for a document (variational inference)}
-
 \begin{figure}[ht!]
 \begin{center}
-\includegraphics[width=0.5\linewidth]{img/k=10/log_likelihood_document_k=10.png}
+\includegraphics[width=0.5\linewidth]{../img/k=20/log_likelihood_document_k=20.png}
 \caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\label{log-likelihood-doc}
 \end{center}
 \end{figure}
+
+Multiple tries of our LDA inference program give different vectors of words for different tries. This is due to the fact that LDA inference is a non-convex optimization problem for $\alpha$ and $\beta$. The initialization of $\alpha$ and $\beta$ may infer on the final  stationary point that we get. We assumed that $\alpha$ follows the exchangeable Dirichlet distribution, which gives to the same weight to each topic.  
+
+For $\beta$, a random initialization may give us some coherent topics (see table \ref{voc-result}). But sometimes, we obtain the same vector of words for each topic. A possible strategy to avoid that is to initialize $\beta$ differently.
 
 \section{Conclusion}
 
@@ -360,6 +362,8 @@ There are other interesting applications of LDA, such that biology (DNA sequence
 
 \begin{thebibliography}{BNJ03}
 \bibitem[BNJ03]{BNJ03} David M. Blei, Andrew Y. Ng and Michael I. Jordan. Latent Dirichlet Allocation. \emph{The Journal of Machine Learning Research}, 3:993--1022, 2003.
+
+\bibitem[MH01]{MH01} \emph{An Experimental Comparison of Several Clustering and Initialization Methods}, Marina Meila, David Heckerman, 2001.
 \end{thebibliography}
 
 
