@@ -1,19 +1,13 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Jacobs Landscape Poster
-% LaTeX Template
-% Version 1.1 (14/06/14)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+% Jacobs Landscape Poster Version 1.1 (14/06/14)
 \documentclass[final]{beamer}
-\usepackage[ruled,vlined]{algorithm2e}
-\usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
-\usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
+\usepackage[scale=1.1]{beamerposter} % Use the beamerposter package for laying out the poster
 \usetheme{confposter} % Use the confposter theme supplied with this template
 \setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
 \setbeamercolor{block body}{fg=black,bg=white} % Colors of the body of blocks
 \setbeamercolor{block alerted title}{fg=white,bg=dblue!70} % Colors of the highlighted block titles
 \setbeamercolor{block alerted body}{fg=black,bg=dblue!10} % Colors of the body of highlighted blocks
 
+\fontfamily{lmss}
 \newlength{\sepwid}
 \newlength{\onecolwid}
 \newlength{\twocolwid}
@@ -31,7 +25,7 @@
 \usepackage{pstricks,pst-plot,pst-text,pst-tree,pst-eps,pst-fill,pst-node,pst-math}
 
 \title{Latent Dirichlet Allocation} % Poster title
-\author{J\'er\^ome DOCK\`ES {\small{(\texttt{jerome\{at\}dockes.org})}}, Pascal LU  {\small{(\texttt{pascal.lu\{at\}centraliens.net})}} } % Author(s)
+\author{J\'er\^ome DOCK\`ES {\small{(\texttt{jerome@dockes.org})}}, Pascal LU  {\small{(\texttt{pascal.lu@centraliens.net})}} } % Author(s)
 \institute{\'Ecole Normale Sup\'erieure de Cachan $-$ \today} % Institution
 
 \begin{document}
@@ -42,28 +36,28 @@
 \setlength{\belowcaptionskip}{2ex} % White space under figures
 \setlength\belowdisplayshortskip{2ex} % White space under equations
 
-\begin{frame}[t] % The whole poster is enclosed in one beamer frame
+\begin{frame}[t] 
+\begin{columns}[t]
 
-\begin{columns}[t] % The whole poster consists of three major columns, the second of which is split into two columns twice - the [t] option aligns each column's content to the top
+%----------------------------------------------------------------------------------------
+%	COLUMN 1
+%----------------------------------------------------------------------------------------
 
 \begin{column}{\sepwid}\end{column} % Empty spacer column
 
 \begin{column}{\onecolwid} % The first column
 
-%----------------------------------------------------------------------------------------
-%	OBJECTIVES
-%----------------------------------------------------------------------------------------
-
 \begin{alertblock}{Objectives}
-We consider the problem of modeling text corpora. The goal is to find short descriptions of the members of a collection that enable efficient processing of large collections while preserving the essential statistical relationships that are useful for basic tasks such as classification, novelty detection, summarization, and similarity and relevance judgments  \cite{BNJ03}.
+We consider the problem of modeling text corpora. The goal is to find short descriptions of the members of a collection.
+\medskip
+
+Our work is mainly based on:
+\nocite{*}
+\small{\bibliographystyle{unsrt}\bibliography{sample}}
 \end{alertblock}
 
-%----------------------------------------------------------------------------------------
-%	INTRODUCTION
-%----------------------------------------------------------------------------------------
 
 \begin{block}{Notations}
-
 \begin{itemize}
   \item $\mathcal{D} = \{d_{1},d_{2}, \ldots, d_{M}\}$ is a corpus.
   \item $\mathcal{V}$ is the vocabulary of size $V$.
@@ -110,32 +104,33 @@ For {\emph{each document} $d \in \mathcal{D}$}{
 }
 \end{block}
 
-\end{column} % End of the first column
+\end{column}
+
+
+%----------------------------------------------------------------------------------------
+% COLUMN 2
+%----------------------------------------------------------------------------------------
 
 \begin{column}{\sepwid}\end{column} % Empty spacer column
-
-\begin{column}{\twocolwid} % Begin a column which is two columns wide (column 2)
-
-\begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column
-
-\begin{column}{\onecolwid}\vspace{-.6in} % The first column within column 2 (column 2.1)
-
-%----------------------------------------------------------------------------------------
-%	MATERIALS
-%----------------------------------------------------------------------------------------
-
+\begin{column}{\onecolwid} % The third column
 \begin{block}{Generative model}
-The \textbf{goal} is to determine:
+The goal is to determine:
 
 \begin{itemize}
 \item $\alpha$ = estimate of the parameter of the Dirichlet distribution which generates the parameter for the (multinomial) probability distribution over topics in the document. Size of $\alpha = k$.
+
+We consider an exchangeable Dirichlet distribution: $\forall i \in \{1, \ldots, k\}$, $\alpha_i = \alpha$
 \item $\beta$ is a matrix of size $k \times V$ which gives the estimated probability that a given topic will generate a certain word: $\beta_{ij}= p(w^j = 1 | z^i = 1)$.
 \end{itemize}
-
+\begin{align*}
+p(d|\alpha, \beta) 
+& = \int p(\theta^{(d)}|\alpha) \left( \prod_{n=1}^{N_{d}} p(w_n^{(d)}|\theta^{(d)}, \beta)\right) \text{d}\theta  \\
+& = \int p(\theta^{(d)}|\alpha) \left( \prod_{n=1}^{N_{d}} \sum_{z_n^{(d)}} p(z_n^{(d)}|\theta^{(d)}) p(w_n^{(d)}|z_n^{(d)}, \beta)\right) \text{d}\theta
+\end{align*}
 \begin{figure}[ht!]
 \begin{center}
 \psset{xunit=3cm,yunit=3cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
-\begin{pspicture*}(-0.5,-0.3)(8,3.5)
+\begin{pspicture*}(-0.5,-0.1)(8,3.4)
 \rput(0,1){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\alpha_j$}}}
 \rput(2,1){\pscirclebox{$\theta^{(d)}_j$}}
 \rput(4,1){\pscirclebox{$z^{(d)}_{nj}$}}
@@ -154,18 +149,49 @@ The \textbf{goal} is to determine:
 \end{figure}
 \end{block}
 
+\begin{block}{Variational inference}
+$\Rightarrow$ Use Jensen's inequality to obtain a lower bound on the log likelihood.
+
+For a document $d \in \mathcal{D}$:
+ \begin{itemize}
+  \item $\gamma^{(d)}$ is the variational parameter for the Dirichlet distribution. Size of $\gamma^{(d)}$ = $k$.
+  \item $\phi^{(d)}$ is the variational parameter for the multinomial distribution. Size of $\phi^{(d)}$ = $N_d \times k$.
+  
+  $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
+   \end{itemize}
+
+$\Rightarrow$ Estimate $\gamma^{(d)}, \phi_{n}^{(d)}$ instead of $\theta^{(d)}$ and $z_n^{(d)}$.
+
+\[ q(\theta^{(d)}, z^{(d)}|\gamma^{(d)}, \delta^{(d)}) = q(\theta^{(d)}|\gamma^{(d)}) \prod_{n=1}^{N_d} q(z_n^{(d)}|\phi_n^{(d)})\]
+
+\begin{figure}
+\begin{center}
+\psset{xunit=3cm,yunit=3cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
+\begin{pspicture*}(-1,-0.1)(4,4)
+\rput(0,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\gamma^{(d)}_j$}}
+\rput(0,1){\pscirclebox{$\theta^{(d)}_j$}}
+\rput(2,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\phi^{(d)}_{nj}$}}
+\rput(2,1){\pscirclebox{$z^{(d)}_{nj}$}}
+\pspolygon(1.25,0.25)(3.15,0.25)(3.15,3.75)(1.25,3.75)
+\pspolygon(-0.9,0)(3.8,0)(3.8,4)(-0.9,4)
+\psline{->}(0,2.5)(0,1.5)
+\psline{->}(2,2.5)(2,1.5)
+\rput(2.75,0.5){$N_d$}
+\rput(3.5,0.25){$M$}
+\end{pspicture*}
+\end{center}
+\end{figure}
+\end{block}
+\end{column}
+
+%----------------------------------------------------------------------------------------
+% COLUMN 3
 %----------------------------------------------------------------------------------------
 
-\end{column} % End of column 2.1
+\begin{column}{\sepwid}\end{column} % Empty spacer column
+\begin{column}{\onecolwid} % The third column
 
-\begin{column}{\onecolwid}\vspace{-.6in} % The second column within column 2 (column 2.2)
-
-%----------------------------------------------------------------------------------------
-% 
-%----------------------------------------------------------------------------------------
-
-\begin{block}{E-step for a document $d$ (Variational Inference Procedure)}
-
+\begin{block}{Variational Inference Procedure (E-step for a document $d$)}
 \begin{itemize}
   \item \textbf{Input}: a document $d$ defined by its \texttt{word$\_$incidences} ($w^{(d)}$), $\alpha, \beta$
   \item \textbf{Output}: $\gamma^{(d)}$, $\phi^{(d)}$
@@ -194,81 +220,10 @@ While {\emph{the expected log-likelihood $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \b
 
 \quad Update $L(\gamma^{(d)}, \phi^{(d)}, \alpha, \beta)$
 }
-
 \end{block}
 
-%----------------------------------------------------------------------------------------
-
-\end{column} % End of column 2.2
-
-\end{columns} % End of the split of column 2 - any content after this will now take up 2 columns width
-
-%----------------------------------------------------------------------------------------
-%	IMPORTANT RESULT
-%----------------------------------------------------------------------------------------
-
-%\begin{alertblock}{Important Result}
-
-%Lorem ipsum dolor \textbf{sit amet}, consectetur adipiscing elit. Sed commodo molestie porta. Sed ultrices scelerisque sapien ac commodo. Donec ut volutpat elit.
-
-%\end{alertblock} 
-
-%----------------------------------------------------------------------------------------
-
-\begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column again
-
-\begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
-
-%----------------------------------------------------------------------------------------
-%	MATHEMATICAL SECTION
-%----------------------------------------------------------------------------------------
-
-\begin{block}{Variational inference}
-
-$\Rightarrow$ Use Jensen's inequality to obtain a lower bound on the log likelihood.
-
-For a document $d \in \mathcal{D}$:
- \begin{itemize}
-  \item $\gamma^{(d)}$ is the variational parameter for the dirichlet distribution. Size of $\gamma^{(d)}$ = $k$.
-  \item $\phi^{(d)}$ is the variational parameter for the multinomial distribution. Size of $\phi^{(d)}$ = $N_d \times k$.
-  
-  $\phi_{ni}^{(d)}$ depends on the relation between the word in position $n$ of the document and the topic $i$ of the list of topics.
-   \end{itemize}
-
-$\Rightarrow$ Estimate $\gamma^{(d)}, \phi_{n}^{(d)}$ instead of $\theta^{(d)}$ and $z_n^{(d)}$.
-
-\begin{figure}
-\begin{center}
-\psset{xunit=3cm,yunit=3cm,algebraic=true,dimen=middle,dotstyle=o,dotsize=5pt 0,linewidth=0.8pt,arrowsize=3pt 2,arrowinset=0.25}
-\begin{pspicture*}(-1,-0.1)(4,5)
-\rput(0,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\gamma^{(d)}_j$}}
-\rput(0,1){\pscirclebox{$\theta^{(d)}_j$}}
-\rput(2,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=green]{$\phi^{(d)}_{nj}$}}
-\rput(2,1){\pscirclebox{$z^{(d)}_{nj}$}}
-\pspolygon(1.25,0.25)(3.15,0.25)(3.15,3.75)(1.25,3.75)
-\pspolygon(-0.9,0)(3.8,0)(3.8,4)(-0.9,4)
-\psline{->}(0,2.5)(0,1.5)
-\psline{->}(2,2.5)(2,1.5)
-\rput(2.75,0.5){$N_d$}
-\rput(3.5,0.25){$M$}
-\end{pspicture*}
-\end{center}
-\end{figure}
-
-\end{block}
-
-%----------------------------------------------------------------------------------------
-
-\end{column} % End of column 2.1
-
-\begin{column}{\onecolwid} % The second column within column 2 (column 2.2)
-
-%----------------------------------------------------------------------------------------
-%	RESULTS
-%----------------------------------------------------------------------------------------
 
 \begin{block}{EM-algorithm}
-
 \begin{itemize}
   \item \textbf{Input}: {Corpus $\mathcal{D}$, number of topics $k$}
   \item \textbf{Output}: $\alpha$, $\beta$
@@ -308,112 +263,86 @@ L''(\alpha) = |\mathcal{D}|k [k\Psi'(k\alpha) - \Psi' \left( \alpha\right)] \end
 
 \begin{block}{Implementation issues}
 \begin{itemize}
-  \item Preprocessing of the documents.
-  \item Initialization of $\alpha$ et $\beta$.
-  \item Optimization of the parameters.
+  \item Document and vocabulary preprocessing : remove redundant words.
+  \item Initialization of $\alpha$ et $\beta$: there were initialized randomly, with $\alpha > 0$.
+  \item Computation of $\alpha$ much simpler under the exchangeable Dirichlet distribution assumption.
+  \item Parameters: choice of $k$, number of iterations so that the E-step and M-step converge.
 \end{itemize}
 \end{block}
+\end{column}
 
 %----------------------------------------------------------------------------------------
-
-\end{column} % End of column 2.2
-
-\end{columns} % End of the split of column 2
-
-\end{column} % End of the second column
+% COLUMN 4
+%----------------------------------------------------------------------------------------
 
 \begin{column}{\sepwid}\end{column} % Empty spacer column
 
 \begin{column}{\onecolwid} % The third column
-
-%----------------------------------------------------------------------------------------
-% RESULTS
-%----------------------------------------------------------------------------------------
-
 \begin{block}{Results}
-
 Tested on real data from the Reuters21578 database (\texttt{reut2-000.sgm}).
 
 \begin{table}
 \vspace{2ex}
 \begin{footnotesize}
-\begin{tabular}{c c c c}
+\begin{tabular}{ccccc}
 \toprule
-\textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4}\\
+\textbf{Topic 1} & \textbf{Topic 2} & \textbf{Topic 3}  & \textbf{Topic 4} & \textbf{Topic 5}\\
 \midrule
-devices & prolonged & zestril & features \\
-disk & council & annesthetic &  shipping  \\
-megabyte & forum & hypertension & 798  \\
-expandable & dissident & oth & 998  \\
-megabytes & flying & statil & sells  \\
-equipped &  sparks & diabetic & AppleWorld  \\
-monochrome &talks & complications & Conference  \\
-peripheral & outweighed & Barbara & 899  \\
-color & accomplishments & definitive & science  \\
+devices & prolonged & zestril & seasons & withdrawn \\
+disk & council & annesthetic &  hotels & expiration  \\
+megabyte & forum & hypertension & VMS & clearances \\
+expandable & dissident & oth & Biltmore  & expire \\
+megabytes & flying & statil & Marriott & Willemijn \\
+equipped &  sparks & diabetic & rename & BV \\
+monochrome &talks & complications & hotel & Rotterdam  \\
+peripheral & outweighed & Barbara & 228 & licensed \\
+color & accomplishments & definitive & DH  & NCR \\
 \bottomrule
 \end{tabular}
 \end{footnotesize}
-\caption{Results for 4 topics $(k=10)$}
+\caption{Results for 5 topics $(k=20)$}
 \end{table}
 
 \begin{figure}[ht!]
 \begin{center}
-\includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_corpus_k=10.png}
-\caption{Expected log-likelihood for the corpus ($k=10$)}
+\includegraphics[width=0.7\linewidth]{../img/k=20/log_likelihood_document_k=20.png}
+\caption{Expected log-likelihood for a document ($k=20$)}
 \end{center}
 \end{figure}
 
 \begin{figure}[ht!]
 \begin{center}
-\includegraphics[width=0.5\linewidth]{../img/k=10/log_likelihood_document_k=10.png}
-\caption{Expected log-likelihood for a document ($k=10$)}
+\includegraphics[width=0.7\linewidth]{../img/k=20/log_likelihood_corpus_k=20.png}
+\caption{Expected log-likelihood for the corpus ($k=20$)}
 \end{center}
 \end{figure}
-
 \end{block}
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
 
 \begin{block}{Conclusion}
-LDA = a way to apply graphical models to information retrieval = group words in the same categories. Key idea = variational inference. 
-
-Other interesting applications: biology (DNA sequence), content-based image retrieval$\ldots$
+\begin{itemize}
+  \item LDA = a way to apply graphical models to information retrieval = group words in the same categories. 
+  \item Key idea = variational inference. 
+  \item Other interesting applications: biology (DNA sequence), content-based image retrieval$\ldots$
+\end{itemize}
 \end{block}
 
-%----------------------------------------------------------------------------------------
-% REFERENCES
-%----------------------------------------------------------------------------------------
+%\begin{block}{References}
+%\nocite{*}
+%\small{\bibliographystyle{unsrt}
+%\bibliography{sample}\vspace{0.75in}}
+%\end{block}
 
-\begin{block}{References}
-
-\nocite{*} % Insert publications even if they are not cited in the poster
-\small{\bibliographystyle{unsrt}
-\bibliography{sample}\vspace{0.75in}}
-
-\end{block}
-
-%----------------------------------------------------------------------------------------
-% CONTACT INFORMATION
-%----------------------------------------------------------------------------------------
-
-\setbeamercolor{block alerted title}{fg=black,bg=norange} % Change the alert block title colors
-\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
-
+\setbeamercolor{block alerted title}{fg=black,bg=norange}
+\setbeamercolor{block alerted body}{fg=black,bg=white}
 %\begin{alertblock}{Contact Information}
 %\begin{itemize}
 %  \item \texttt{jerome\{at\}dockes.org}
 %  \item \texttt{pascal.lu\{at\}centraliens.net}
 %\end{itemize}
 %\end{alertblock}
-
-%----------------------------------------------------------------------------------------
-
-\end{column} % End of the third column
+\end{column}
 
 \end{columns} % End of all the columns in the poster
-
 \end{frame} % End of the enclosing frame
 
 \end{document}
