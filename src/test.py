@@ -5,27 +5,47 @@ import doc_preprocessing as dp
 reload(dp)
 import variational_inference as vi
 reload(vi)
+import utils
 
 # path_to_reuters = path.expanduser(
-#       '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/')
+#      '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/')
 
 path_to_reuters = path.expanduser(
  '~/Documents/MVA/proba_graph_models/project/reuters_21578')
 
+def results_dir():
+    return path.expanduser(
+        '~/Documents/MVA/proba_graph_models/project/results_tmp')
+
+class Dirich_features_logger(utils.Logger):
+    def __init__(self, **kwargs):
+        utils.Logger.__init__(self, self_dir_name = 'lda_features', **kwargs)
+        self.lda_file_path = path.join(self.dir_path, 'lda_features.npy')
+
+    def call_hook_(self, dirich_features):
+        with open(self.lda_file_path, 'w') as lda_file:
+            np.save(lda_file, dirich_features)
+
+
+    
 def test_variational_inference(voc = None, docs = None,
                                max_files = None, doc_num = None, n_topics = 50,
                                dirich_param = .5,
                                log_word_proba_given_topic = None,
                                **kwargs):
 
+    description = {'n_topics': n_topics,
+                   'dirich_param': dirich_param}
+    
     if(voc == None or docs == None):
-        #voc, docs = dp.build_voc(dp.find_reuters_files(path_to_reuters)[:max_files])
-        voc, docs = dp.build_voc([path.join(path_to_reuters,
-                                            'reut2-000.sgm')])
+        files_list = [path.join(path_to_reuters, 'reut2-000.sgm')]
+        description['data_files_list'] = files_list
+        voc, docs = dp.build_voc(files_list)
         print voc.keys()[:10]
 
     voc_size = len(voc)
-
+    description['voc_size'] = voc_size
+    
     if doc_num == None:
         doc_count = len(docs)
         print 'doc_count: %d' % doc_count
@@ -37,32 +57,38 @@ def test_variational_inference(voc = None, docs = None,
         word_proba_given_topic /= np.sum(word_proba_given_topic,
                                          axis = 1).reshape((-1,1))
         log_word_proba_given_topic = np.log(word_proba_given_topic)
-    
-    
-    # test for a document d
-    var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
-        docs[doc_num], dirich_param, log_word_proba_given_topic, **kwargs)
-    
-    plt.figure(1)
-    plt.plot(log_likelihoods)   
-    plt.xlabel('iterations')
-    plt.ylabel('expected log-likelihood')
-    plt.title('expected log-likelihood for a document d, k = ' + str(n_topics))
 
-    
+
+    # # test for a document d
+    # var_dirich, var_multinom, log_likelihoods = vi.variational_inference(
+    #     docs[doc_num], dirich_param, log_word_proba_given_topic, **kwargs)
+
+    # plt.figure(1)
+    # plt.plot(log_likelihoods)
+    # plt.xlabel('iterations')
+    # plt.ylabel('expected log-likelihood')
+    # plt.title('expected log-likelihood for a document d, k = '
+    # + str(n_topics))
+
     # test for a corpus
-    (dirich_param, word_logproba_given_topic, corpus_log_likelihood) = vi.latent_dirichlet_allocation(docs, n_topics, voc_size)
-    plt.figure(2)
-    plt.plot(corpus_log_likelihood)    
-    plt.xlabel('iterations')
-    plt.ylabel('expected log-likelihood')
-    plt.title('expected log-likelihood for a corpus, k = ' + str(n_topics))
-    plt.show()
+    logger = Dirich_features_logger(root_results_dir = results_dir(),
+                                    description = description)
     
-    top_words = topic_top_words(word_logproba_given_topic, voc, num_words = 10)    
-    
-    print top_words    
-    
+    (dirich_param, word_logproba_given_topic, corpus_log_likelihood) \
+        = vi.latent_dirichlet_allocation(docs, n_topics, voc_size,
+                                         max_iter = 3, var_inf_max_iter = 3,
+                                         logger = logger)
+    # plt.figure(2)
+    # plt.plot(corpus_log_likelihood)
+    # plt.xlabel('iterations')
+    # plt.ylabel('expected log-likelihood')
+    # plt.title('expected log-likelihood for a corpus, k = ' + str(n_topics))
+    # plt.show()
+
+    # top_words = topic_top_words(
+    # word_logproba_given_topic, voc, num_words = 10)
+    # print top_words
+
     #return (dirich_param, word_logproba_given_topic, top_words)
 
 
