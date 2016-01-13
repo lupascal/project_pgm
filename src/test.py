@@ -29,7 +29,7 @@ class Dirich_features_logger(utils.Logger):
 
     
 def test_variational_inference(voc = None, docs = None,
-                               max_files = None, doc_num = None, n_topics = 50,
+                               max_files = None, doc_num = None, n_topics = 20,
                                dirich_param = .5,
                                log_word_proba_given_topic = None,
                                **kwargs):
@@ -38,7 +38,17 @@ def test_variational_inference(voc = None, docs = None,
                    'dirich_param': dirich_param}
     
     if(voc == None or docs == None):
-        files_list = [path.join(path_to_reuters, 'reut2-000.sgm')]
+        files_list = [path.join(path_to_reuters, 'reut2-000.sgm'),
+                      path.join(path_to_reuters, 'reut2-001.sgm'),
+                      path.join(path_to_reuters, 'reut2-002.sgm'),
+                      path.join(path_to_reuters, 'reut2-003.sgm'),
+                      path.join(path_to_reuters, 'reut2-004.sgm'),
+                      path.join(path_to_reuters, 'reut2-005.sgm'),
+                      path.join(path_to_reuters, 'reut2-006.sgm'),
+                      path.join(path_to_reuters, 'reut2-007.sgm'),
+                      path.join(path_to_reuters, 'reut2-008.sgm'),
+                      path.join(path_to_reuters, 'reut2-009.sgm')]
+        
         description['data_files_list'] = files_list
         voc, docs = dp.build_voc(files_list)
         print voc.keys()[:10]
@@ -76,7 +86,7 @@ def test_variational_inference(voc = None, docs = None,
     
     (dirich_param, word_logproba_given_topic, corpus_log_likelihood) \
         = vi.latent_dirichlet_allocation(docs, n_topics, voc_size,
-                                         max_iter = 3, var_inf_max_iter = 3,
+                                         max_iter = 200, var_inf_max_iter = 200,
                                          logger = logger)
     # plt.figure(2)
     # plt.plot(corpus_log_likelihood)
