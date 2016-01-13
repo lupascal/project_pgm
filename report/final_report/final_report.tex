@@ -53,8 +53,10 @@ For a document $d \in \mathcal{D}$,
 \begin{itemize}  
 \setlength\itemsep{-0.2em}
 %  \item $d = (w_1, \ldots, w_{n(d)})$ represents the document $d$ of the corpus $^{(d)}$, composed of a sequence of $n(d)$ words.
-  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all distinct. $N_d$ (\verb"doc_size") is the number of \textbf{distinct}\footnote{For implementation issues, this representation for a document is smaller than the representation proposed by \cite{BNJ03}.} words in the document $d$.
-  \item $w^{(d)}$ (\verb"word_incidences") is an matrix containing the number of times each word in the vocabulary appears in the document. The size of $w^{(d)}$ is the number of distinct words in document $d$ $\times$ vocabulary size ($N_d \times V$).
+  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$. $N_d$ is the number of words in the document $d$.
+  \item $w^{(d)}$ is a matrix whose element $w_{ni}^{(d)} = 1$ if the word $n$ in the 
+document is the word $i$ in the vocabulary. The size of $w^{(d)}$ is $N_d \times V$.
+  
  %   $w_{nj}^{(d)} = \begin{cases} 1 & \text{if the word in position } n \text{ of the document is the word in position } j \text{ of the dictionary} \\ 0 & \text{otherwise} \end{cases}$
  \item $\theta^{(d)}$ is an array of size $k$, representing a probability density.
  \item $z^{(d)}$ is the set of topics : $z_{ni}^{(d)} =  1$ if the word $n$ is linked with the topic $i$. Hence, it is a matrix of size $N_d \times k$.
@@ -66,14 +68,14 @@ Latent Dirichlet allocation (LDA) is a generative probabilistic model of a corpu
 
 \begin{algorithm}
 \caption{Generative process}
-\KwData{corpus $\mathcal{D}$}
+\KwResult{corpus $\mathcal{D}$}
 \Begin{
 \For{\emph{each document} $d \in \mathcal{D}$}{
-Choose $N \sim \textnormal{Poisson}(\xi)$\;
+Choose $N_d \sim \textnormal{Poisson}(\xi)$\;
 Choose $\theta^{(d)} \sim \textnormal{Dir}(\alpha)$\;
-\For{\emph{each of the $N$ words $w_n^{(d)}$}}{
+\For{\emph{each of the $N_d$ words $w_n^{(d)}$}}{
 Choose a topic $z_n^{(d)} \sim  \textnormal{Multinomial}(\theta^{(d)})$\;
-Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability conditioned on the topic $z_n^{(d)}$.
+Choose a word $w_n^{(d)}$ from $p(w_n^{(d)} |z_n^{(d)}, \beta)$, a multinomial probability conditioned on the topic $z_n^{(d)}$.
 }
 }
 }
@@ -90,10 +92,10 @@ Choose a word $w_n$ from $p(w_n |z_n^{(d)}, \beta)$, a multinomial probability c
 \rput(6,3){\pscirclebox[linecolor=black,fillstyle=solid,fillcolor=blue]{\textcolor{white}{$\beta_{jv}$}}}
 \pspolygon(3.25,0.25)(7.2,0.25)(7.2,1.75)(3.25,1.75)
 \pspolygon(1.25,0)(7.75,0)(7.75,2)(1.25,2)
-\psline{->}(0.27,1)(1.58,1)
-\psline{->}(2.43,1)(3.58,1)
-\psline{->}(4.44,1)(5.5,1)
-\psline{->}(6,2.7)(6,1.5)
+\psline{->}(0.33,1)(1.53,1)
+\psline{->}(2.5,1)(3.53,1)
+\psline{->}(4.5,1)(5.5,1)
+\psline{->}(6,2.6)(6,1.52)
 \rput(6.75,0.5){$N_d$}
 \rput(7.5,0.25){$M$}
 \end{pspicture*}
@@ -180,7 +182,7 @@ $\phi_{ni}^{(d)} = \beta_{iw_n^{(d)}}\exp(\Psi(\gamma_i^{(d)}))$
 }
 normalize $\phi_n^{(d)}$ to sum to $1$.
 }
-$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)}$
+$\gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} \phi_n^{(d)}$
 }
 }
 \end{algorithm}
@@ -250,6 +252,15 @@ $\alpha \leftarrow \alpha - \frac{\frac{\partial L}{\partial\alpha}(\alpha)}{\fr
 \section{Implementation and results}
 \subsection{Implementation}
 
+For implementation issues, we have chosen another representation for the documents.
+\begin{itemize}
+  \item $d = (w_1^{(d)}, \ldots, w_{N_d}^{(d)})$ represents the document $d$, where the $w_i^{(d)}$ are all \textbf{distinct}. We denote $N_d$ (\verb"doc_size") the number of \textbf{distinct} words in the document $d$.
+  \item $w^{(d)}$ (\verb"word_incidences") is a dictionary (of $N_d$ entries) containing for each distinct word (indexed by its position in the vocabulary) the number of times it appears in the document.
+\end{itemize}
+
+These new notations change the algorithm 2. Its last line becomes:
+\[ \gamma^{(d)} = \alpha + \sum_{n=1}^{N_d} w_n^{(d)} \phi_n^{(d)} \]
+
 The following algorithm was implemented :
 
 \begin{algorithm}
@@ -300,7 +311,7 @@ $\alpha \leftarrow \alpha - \frac{\frac{\partial L}{\partial\alpha}(\alpha)}{\fr
 \textbf{Initialization}:
 \begin{itemize}
 \setlength\itemsep{-0.2em}
-  \item $\alpha> 0$ is chosen randomly. %We have chosen $\alpha = 0.5$.
+  \item $\alpha> 0$ is fixed. We have chosen $\alpha = 0.5$.
   \item $\beta$ is chosen randomly, with $\sum_{j} \beta_{ij} = 1$ $\forall i \in \{1, \ldots, V\}$.
 \end{itemize}
 
@@ -327,7 +338,7 @@ peripheral & outweighed & Barbara & 228 & licensed \\
 color & accomplishments & definitive & DH  & NCR \\
 \hline
 \end{tabular}
-\caption{Results for 5 topics on the corpus \texttt{reut2-000.sgm} $(k=10)$}
+\caption{Results for 5 topics on the corpus \texttt{reut2-000.sgm} $(k=20)$}
 \label{voc-result}
 \end{center}
 \end{table}
@@ -345,7 +356,7 @@ Figure \ref{log-likelihood-corpus} represents the evolution of the expected log-
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.5\linewidth]{../img/k=20/log_likelihood_document_k=20.png}
-\caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=10$)}
+\caption{Expected log-likelihood for a document of the corpus \texttt{reut2-000.sgm} ($k=20$)}
 \label{log-likelihood-doc}
 \end{center}
 \end{figure}
@@ -353,6 +364,34 @@ Figure \ref{log-likelihood-corpus} represents the evolution of the expected log-
 Multiple tries of our LDA inference program give different vectors of words for different tries. This is due to the fact that LDA inference is a non-convex optimization problem for $\alpha$ and $\beta$. The initialization of $\alpha$ and $\beta$ may infer on the final  stationary point that we get. We assumed that $\alpha$ follows the exchangeable Dirichlet distribution, which gives to the same weight to each topic.  
 
 For $\beta$, a random initialization may give us some coherent topics (see table \ref{voc-result}). But sometimes, we obtain the same vector of words for each topic. A possible strategy to avoid that is to initialize $\beta$ differently.
+
+\section{Document classification}
+
+In this section, we are wondering whether the latent variables $(\gamma^{(d)}, \phi_n^{(d)})$ might be a good representation of a document $d$.
+
+We consider the binary classification problem on a subset of the Reuters-21578 dataset (\texttt{reut2-000.sgm}, $\ldots$, \texttt{reut2-009.sgm}). The classification labels are ``\emph{earn}" and ``\emph{not earn}".
+
+%The dataset contains 8000 documents and 15,818 words.
+
+We trained two support vector machines (SVM) with a Gaussian RBF kernel ($\gamma= \frac{1}{2\sigma^2}=5$), using the package \texttt{scikit-learn} for Python:
+\begin{itemize}
+  \item one on the low-dimensional representation $\gamma^{(d)}$ provided by LDA,
+  \item one on all the word features.
+\end{itemize}
+
+The accuracy rate for this binary classification problem with both representations are plotted in figure \ref{accuracy}.
+
+\begin{figure}[ht!]
+\begin{center}
+%\includegraphics[width=0.5\linewidth]{../img/....png}
+\caption{Accuracy rate for document classification problem}
+\label{accuracy}
+\end{center}
+\end{figure}
+
+Figure \ref{accuracy} shows that the LDA low-dimensional representation has a better accuracy than the ``all the word features" representation.
+
+Topic-based representation provided by LDA may be useful as a fast filtering algorithm for feature selection in text classification.
 
 \section{Conclusion}
 
@@ -364,6 +403,8 @@ There are other interesting applications of LDA, such that biology (DNA sequence
 \bibitem[BNJ03]{BNJ03} David M. Blei, Andrew Y. Ng and Michael I. Jordan. Latent Dirichlet Allocation. \emph{The Journal of Machine Learning Research}, 3:993--1022, 2003.
 
 \bibitem[MH01]{MH01} \emph{An Experimental Comparison of Several Clustering and Initialization Methods}, Marina Meila, David Heckerman, 2001.
+
+\bibitem[YIS]{YIS} \emph{Latent Support Measure Machines for Bag-of-Words Data Classification}, Y. Yoshikawa, T. Iwata and H. Sawada
 \end{thebibliography}
 
 

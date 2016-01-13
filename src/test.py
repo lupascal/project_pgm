@@ -7,15 +7,14 @@ import variational_inference as vi
 reload(vi)
 import utils
 
-# path_to_reuters = path.expanduser(
-#      '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/')
+path_to_project = '/home/student/probabilistic_graphical_models/project_pgm/'
+#path = '~/Documents/MVA/proba_graph_models/project/'
 
-path_to_reuters = path.expanduser(
- '~/Documents/MVA/proba_graph_models/project/reuters_21578')
+path_to_reuters = path.expanduser(path_to_project + 'reuters21578/')
 
 def results_dir():
-    return path.expanduser(
-        '~/Documents/MVA/proba_graph_models/project/results_tmp')
+    return path.expanduser(path_to_project + 'results/')
+
 
 class Dirich_features_logger(utils.Logger):
     def __init__(self, **kwargs):
@@ -38,7 +37,7 @@ def test_variational_inference(voc = None, docs = None,
                    'dirich_param': dirich_param}
     
     if(voc == None or docs == None):
-        files_list = [path.join(path_to_reuters, 'reut2-000.sgm'),
+        files_list = [path.join(path_to_reuters, 'reut2-000.sgm'), 
                       path.join(path_to_reuters, 'reut2-001.sgm'),
                       path.join(path_to_reuters, 'reut2-002.sgm'),
                       path.join(path_to_reuters, 'reut2-003.sgm'),
@@ -48,7 +47,7 @@ def test_variational_inference(voc = None, docs = None,
                       path.join(path_to_reuters, 'reut2-007.sgm'),
                       path.join(path_to_reuters, 'reut2-008.sgm'),
                       path.join(path_to_reuters, 'reut2-009.sgm')]
-        
+        print files_list        
         description['data_files_list'] = files_list
         voc, docs = dp.build_voc(files_list)
         print voc.keys()[:10]

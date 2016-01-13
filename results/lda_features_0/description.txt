@@ -1,0 +1,7 @@
+time begin : Wed Jan 13 00:17:27 2016
+voc_size : 23990
+n_topics : 50
+data_files_list : ['/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-000.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-001.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-002.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-003.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-004.sgm']
+dirich_param : 0.5
+log called 200 times
+time end : Wed Jan 13 03:52:44 2016

@@ -1,0 +1,5 @@
+time begin : Wed Jan 13 04:43:21 2016
+voc_size : 33221
+n_topics : 50
+data_files_list : ['/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-000.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-001.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-002.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-003.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-004.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-005.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-006.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-007.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-008.sgm', '/home/student/probabilistic_graphical_models/project_pgm/reuters21578/reut2-009.sgm']
+dirich_param : 0.5
